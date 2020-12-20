@@ -1,5 +1,5 @@
-#ifndef C8_INCLUDED
-#define C8_INCLUDED
+#ifndef C8_H_INCLUDED
+#define C8_H_INCLUDED
 
 #include <stdint.h>
 #include <stddef.h>
@@ -24,5 +24,6 @@ extern void     C8_free         (C8_ptr *c8);
 extern void     C8_reset        (C8_ptr c8);
 extern void     C8_load_program (C8_ptr c8, const uint8_t *data, size_t n);
 extern void     C8_cycle        (C8_ptr c8);
+extern void     C8_timers       (C8_ptr c8);
 
-#endif
+#endif // C8_H_INCLUDED

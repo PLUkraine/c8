@@ -1,7 +1,19 @@
 #include "gtest/gtest.h"
 extern "C"
 {
-   #include "c8.h"
+    #include "cummon.h"
+    #include "c8.h"
+}
+
+TEST(cummon_test, bit_defines)
+{
+    auto number = 0xBB2f56;
+    EXPECT_EQ(0x0f56, BIT_LO_24(number));
+    EXPECT_EQ(0x0056, BIT_LO_16(number));
+    EXPECT_EQ(0x0006, BIT_LO_8 (number));
+    EXPECT_EQ(0x2000, BIT_HI_8 (number));
+    EXPECT_EQ(0x2f00, BIT_HI_16(number));
+    EXPECT_EQ(0x2f50, BIT_HI_24(number));
 }
 
 TEST(c8_tests, init_free)

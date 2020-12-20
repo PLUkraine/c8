@@ -3,6 +3,7 @@
 #include <string.h>
 #include "cummon.h"
 #include "c8.h"
+#include "c8_private.h"
 
 static const uint16_t C8_START_ADDR = 0x200;
 static const uint16_t C8_LAST_ADDR  = 0xFFF;
@@ -75,10 +76,15 @@ void C8_cycle (C8_ptr c8)
 {
     assert(c8);
     assert(!(c8->PC & 1));
-    uint8_t hiPC = c8->Ram[c8->PC++];
-    uint8_t loPC = c8->Ram[c8->PC++];
-    Q_UNUSED(hiPC);
-    Q_UNUSED(loPC);
-    // todo: decrement timers
-    // todo: exec opcode
+    
+    uint16_t opcode = (c8->Ram[c8->PC] << 8) | c8->Ram[c8->PC+1];
+    c8->PC += 2;
+    C8_exec_opcode(c8, opcode);
+}
+
+void C8_timers(C8_ptr c8)
+{
+    assert(c8);
+    if (c8->DT-- == 0) c8->DT = 0;
+    if (c8->ST-- == 0) c8->ST = 0;
 }

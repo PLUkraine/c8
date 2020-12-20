@@ -45,6 +45,10 @@ TEST(c8_tests, load_program)
     C8_reset(c8);
     char data[] = "pidora lol";
     C8_load_program(c8, (uint8_t *)data, strlen(data));
+    for (size_t i=0; i<NELEMS(data); ++i)
+    {
+        EXPECT_EQ(c8->Ram[0x200+i], data[i]);
+    }
 
     C8_free(&c8);
 }

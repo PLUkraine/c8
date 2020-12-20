@@ -22,10 +22,13 @@ include(GoogleTest)
 enable_testing()
 add_subdirectory(tests)
 
-# create executable
-add_executable(${PROJECT_NAME} src/main.c src/cummon.h src/logging.h src/logging.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
-target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_WARNINGS})
+# create targets
+add_library(c8_lib STATIC src/c8.c)
+target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS})
+
+add_executable(c8 src/main.c src/logging.c)
+target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)
+target_compile_options(c8 PRIVATE ${COMPILER_WARNINGS})
 
 # CPack?
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

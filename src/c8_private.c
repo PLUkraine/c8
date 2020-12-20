@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "c8_private.h"
 #include "cummon.h"
 
@@ -33,6 +35,14 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // SE VX, byte
         if (c8->Vx[NIMB_3(opcode)] == BIT_LO_8(opcode))
+        {
+            c8->PC += 2;
+        }
+    }
+    else if (BIT_HI_4(opcode) == 0x4)
+    {
+        // SNE VX, byte
+        if (c8->Vx[NIMB_3(opcode)] != BIT_LO_8(opcode))
         {
             c8->PC += 2;
         }

@@ -5,13 +5,18 @@ extern "C"
     #include "c8.h"
 }
 
-TEST(c8_opcode, SYS)
+C8_ptr init_c8(uint8_t *opcode, size_t N)
 {
     auto c8 = C8_init();
-
     C8_reset(c8);
+    C8_load_program(c8, opcode, N);
+    return c8;
+}
+
+TEST(c8_opcode, SYS)
+{
     uint8_t opcode[] = { 0x0A, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0xABC);
@@ -21,11 +26,8 @@ TEST(c8_opcode, SYS)
 
 TEST(c8_opcode, JP)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x1A, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0xABC);
@@ -35,11 +37,8 @@ TEST(c8_opcode, JP)
 
 TEST(c8_opcode, RET_normal)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x00, 0xEE,};
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Stack[1] = 0x0ABC;
     c8->SP = 1;
@@ -53,11 +52,8 @@ TEST(c8_opcode, RET_normal)
 
 TEST(c8_opcode, RET_overflow)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x00, 0xEE, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Stack[0] = 0x0ABC;
     c8->SP = 0;
@@ -71,11 +67,8 @@ TEST(c8_opcode, RET_overflow)
 
 TEST(c8_opcode, CALL_normal)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x2A, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Stack[0] = 0x0000;
     c8->SP = 0;
@@ -90,11 +83,8 @@ TEST(c8_opcode, CALL_normal)
 
 TEST(c8_opcode, CALL_overflow)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x2A, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Stack[15] = 0x0000;
     c8->SP = 15;
@@ -109,11 +99,8 @@ TEST(c8_opcode, CALL_overflow)
 
 TEST(c8_opcode, SE_skip)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x35, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Vx[5] = 0xBC;
 
@@ -125,16 +112,39 @@ TEST(c8_opcode, SE_skip)
 
 TEST(c8_opcode, SE_no_skip)
 {
-    auto c8 = C8_init();
-
-    C8_reset(c8);
     uint8_t opcode[] = { 0x35, 0xAA, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
+    auto c8 = init_c8(opcode, NELEMS(opcode));
 
     c8->Vx[5] = 0xBC;
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x202);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, SNE_no_skip)
+{
+    uint8_t opcode[] = { 0x45, 0xBC, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[5] = 0xBC;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, SNE_skip)
+{
+    uint8_t opcode[] = { 0x45, 0xAA, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[5] = 0xBC;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x204);
 
     C8_free(&c8);
 }

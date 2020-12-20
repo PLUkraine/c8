@@ -18,6 +18,7 @@ TEST(c8_tests, reset)
     auto c8 = C8_init();
 
     C8_reset(c8);
+    EXPECT_EQ(c8->PC,           0x200);
     EXPECT_EQ(c8->Ram[0],       0xF0);
     EXPECT_EQ(c8->Ram[16*5-1],  0x80);
     EXPECT_EQ(c8->Ram[16*5],    0x00);

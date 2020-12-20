@@ -12,6 +12,19 @@ else()
   set(COMPILER_WARNINGS -Wall -Wextra -Werror)
 endif()
 
+# profiler?
+option(PROFILER_BUILD "compile for profiling" OFF)
+set(PROFILER_FLAGS "")
+if(${PROFILER_BUILD})
+  message("Compiling for profiling")
+  if(MSVC)
+    set(PROFILER_FLAGS /PROFILE)
+  else()
+    set(PROFILER_FLAGS -pg)
+  endif()
+endif()
+
+
 # find required libs
 find_package(SDL2 REQUIRED)
 find_package(GTest REQUIRED)
@@ -24,12 +37,12 @@ add_subdirectory(tests)
 
 # create targets
 add_library(c8_lib STATIC src/c8.c)
-target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS})
+target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 
 add_executable(c8 src/main.c src/logging.c)
 target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)
-target_compile_options(c8 PRIVATE ${COMPILER_WARNINGS})
+target_compile_options(c8 PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 
 # CPack?
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

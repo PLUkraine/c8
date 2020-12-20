@@ -36,7 +36,7 @@ C8_ptr C8_init(void)
     assert(malloc_call);
     c8 = (C8_ptr) malloc_call;
     
-    malloc_call = malloc(C8_LAST_ADDR);
+    malloc_call = malloc(C8_LAST_ADDR + 1);
     assert(malloc_call);
     c8->Ram = (uint8_t *)malloc_call;
 
@@ -67,7 +67,7 @@ void C8_load_program (C8_ptr c8, const uint8_t *data, size_t n)
 {
     assert(c8);
     assert(data);
-    assert(n > 0);
+    assert(0 < n && n <= (size_t)(C8_LAST_ADDR - C8_START_ADDR + 1));
     memcpy(c8->Ram + C8_START_ADDR, data, n);
 }
 

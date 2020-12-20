@@ -16,9 +16,9 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         c8->PC = c8->Stack[c8->SP--];
         if (c8->SP == 0xFF) c8->SP = NELEMS(c8->Stack) - 1;
     }
-    else if (BIT_HI_8(opcode) == 0x0)
+    else if (BIT_HI_4(opcode) == 0x0 || BIT_HI_4(opcode) == 0x1)
     {
-        // SYS addr
-        c8->PC = BIT_LO_24(opcode);
+        // SYS addr && JP addr
+        c8->PC = BIT_LO_12(opcode);
     }
 }

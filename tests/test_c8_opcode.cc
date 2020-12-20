@@ -19,6 +19,20 @@ TEST(c8_opcode, SYS)
     C8_free(&c8);
 }
 
+TEST(c8_opcode, JP)
+{
+    auto c8 = C8_init();
+
+    C8_reset(c8);
+    uint8_t opcode[] = { 0x1A, 0xBC, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0xABC);
+
+    C8_free(&c8);
+}
+
 TEST(c8_opcode, RET_normal)
 {
     auto c8 = C8_init();

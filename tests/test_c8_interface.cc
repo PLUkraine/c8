@@ -15,6 +15,7 @@ TEST(cummon_test, bit_defines)
     EXPECT_EQ(  0x2f, BIT_HI_8 (number));
     EXPECT_EQ( 0x2f5, BIT_HI_12(number));
     EXPECT_EQ(   0xf, NIMB_3   (number));
+    EXPECT_EQ(   0x5, NIMB_2   (number));
 }
 
 TEST(c8_tests, init_free)

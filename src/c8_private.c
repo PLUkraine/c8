@@ -47,4 +47,13 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             c8->PC += 2;
         }
     }
+    else if (BIT_HI_4(opcode) == 0x5
+          && BIT_LO_4(opcode) == 0x0)
+    {
+        // SE Vx, Vy
+        if (c8->Vx[NIMB_3(opcode)] == c8->Vx[NIMB_2(opcode)])
+        {
+            c8->PC += 2;
+        }
+    }
 }

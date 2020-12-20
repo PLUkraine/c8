@@ -148,3 +148,39 @@ TEST(c8_opcode, SNE_skip)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, SEV_skip)
+{
+    // reorder C6 to 6C
+    uint8_t opcode[] = { 0x5C, 0x60, 0x00, 0x00, 0x56, 0xC0, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0x6] = 0xBC;
+    c8->Vx[0xC] = 0xBC;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x204);
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x208);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, SEV_no_skip)
+{
+    // reorder C6 to 6C
+    uint8_t opcode[] = { 0x5C, 0x60, 0x56, 0xC0, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0x6] = 0xBC;
+    c8->Vx[0xC] = 0xAA;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x204);
+
+    C8_free(&c8);
+}

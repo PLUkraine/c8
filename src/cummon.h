@@ -9,5 +9,6 @@
 #define BIT_HI_8(x)  (((x) & 0xFF00) >> 8)
 #define BIT_HI_12(x) (((x) & 0xFFF0) >> 4)
 #define NIMB_3(x)    (((x) & 0x0F00) >> 8)
+#define NIMB_2(x)    (((x) & 0x00F0) >> 4)
 
 #endif // CUMMON_H_INCLUDED

@@ -21,4 +21,11 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // SYS addr && JP addr
         c8->PC = BIT_LO_12(opcode);
     }
+    else if (BIT_HI_4(opcode) == 0x2)
+    {
+        // CALL addr
+        c8->Stack[c8->SP++] = c8->PC;
+        if (c8->SP >= NELEMS(c8->Stack)) c8->SP = 0;
+        c8->PC = BIT_LO_12(opcode);
+    }
 }

@@ -68,3 +68,41 @@ TEST(c8_opcode, RET_overflow)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, CALL_normal)
+{
+    auto c8 = C8_init();
+
+    C8_reset(c8);
+    uint8_t opcode[] = { 0x2A, 0xBC, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Stack[0] = 0x0000;
+    c8->SP = 0;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0xABC);
+    EXPECT_EQ(c8->SP, 1);
+    EXPECT_EQ(c8->Stack[0], 0x202);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, CALL_overflow)
+{
+    auto c8 = C8_init();
+
+    C8_reset(c8);
+    uint8_t opcode[] = { 0x2A, 0xBC, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Stack[15] = 0x0000;
+    c8->SP = 15;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0xABC);
+    EXPECT_EQ(c8->SP, 0);
+    EXPECT_EQ(c8->Stack[15], 0x202);
+
+    C8_free(&c8);
+}

@@ -4,15 +4,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define T C8_T
-typedef struct T *T;
+struct C8_T;
+typedef struct C8_T *C8_ptr;
 
-extern T        C8_init         (void);
-extern void     C8_free         (T *c8);
+extern C8_ptr   C8_init         (void);
+extern void     C8_free         (C8_ptr *c8);
 
 extern void     C8_reset        (void);
 extern void     C8_load_program (const uint8_t *data, size_t n);
 extern void     C8_cycle        (void);
 
-#undef T
 #endif

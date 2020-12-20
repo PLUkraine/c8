@@ -1,5 +1,5 @@
 add_executable(TestExample test_example.cc)
-target_link_libraries(TestExample GTest::GTest GTest::Main)
+target_link_libraries(TestExample GTest::GTest GTest::Main c8_lib)
 target_compile_options(TestExample PRIVATE ${COMPILER_WARNINGS})
 
 gtest_add_tests(TARGET      TestExample

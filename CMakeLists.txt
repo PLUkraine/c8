@@ -25,6 +25,7 @@ add_subdirectory(tests)
 # create targets
 add_library(c8_lib STATIC src/c8.c)
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS})
+target_include_directories(c8_lib PUBLIC src)
 
 add_executable(c8 src/main.c src/logging.c)
 target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)

@@ -61,4 +61,10 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // LD Vx, byte
         c8->Vx[NIMB_3(opcode)] = BIT_LO_8(opcode);
     }
+    else if (BIT_HI_4(opcode) == 0x7)
+    {
+        // ADD Vx, byte
+        // note: no carry
+        c8->Vx[NIMB_3(opcode)] += BIT_LO_8(opcode);
+    }
 }

@@ -56,4 +56,9 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             c8->PC += 2;
         }
     }
+    else if (BIT_HI_4(opcode) == 0x6)
+    {
+        // LD Vx, byte
+        c8->Vx[NIMB_3(opcode)] = BIT_LO_8(opcode);
+    }
 }

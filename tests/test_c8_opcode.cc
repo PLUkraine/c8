@@ -184,3 +184,17 @@ TEST(c8_opcode, SEV_no_skip)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, LD)
+{
+    uint8_t opcode[] = { 0x6C, 0xBC, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0xC] = 0x00;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+    EXPECT_EQ(c8->Vx[0xC], 0xBC);
+
+    C8_free(&c8);
+}

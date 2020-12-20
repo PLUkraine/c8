@@ -106,3 +106,35 @@ TEST(c8_opcode, CALL_overflow)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, SE_skip)
+{
+    auto c8 = C8_init();
+
+    C8_reset(c8);
+    uint8_t opcode[] = { 0x35, 0xBC, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[5] = 0xBC;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x204);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, SE_no_skip)
+{
+    auto c8 = C8_init();
+
+    C8_reset(c8);
+    uint8_t opcode[] = { 0x35, 0xAA, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[5] = 0xBC;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+
+    C8_free(&c8);
+}

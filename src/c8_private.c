@@ -9,6 +9,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // CLS
         // TODO implement display
+        assert(0);
     }
     else if (opcode == 0x00EE)
     {
@@ -27,5 +28,13 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         c8->Stack[c8->SP++] = c8->PC;
         if (c8->SP >= NELEMS(c8->Stack)) c8->SP = 0;
         c8->PC = BIT_LO_12(opcode);
+    }
+    else if (BIT_HI_4(opcode) == 0x3)
+    {
+        // SE VX, byte
+        if (c8->Vx[NIMB_3(opcode)] == BIT_LO_8(opcode))
+        {
+            c8->PC += 2;
+        }
     }
 }

@@ -99,4 +99,11 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         c8->Vx[NIMB_3(opcode)] = res;
         c8->Vx[0xF           ] = res > 0xFF;
     }
+    else if (BIT_HI_4(opcode) == 0x8
+          && BIT_LO_4(opcode) == 0x5)
+    {
+        // SUB Vx, Vy
+        c8->Vx[0xF           ]  = c8->Vx[NIMB_3(opcode)] > c8->Vx[NIMB_2(opcode)];
+        c8->Vx[NIMB_3(opcode)] -= c8->Vx[NIMB_2(opcode)];
+    }
 }

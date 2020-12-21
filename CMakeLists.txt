@@ -36,7 +36,7 @@ enable_testing()
 add_subdirectory(tests)
 
 # create targets
-add_library(c8_lib STATIC src/c8.c src/c8_private.c)
+add_library(c8_lib STATIC src/c8.c src/c8_private.c src/c8_random.c)
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 

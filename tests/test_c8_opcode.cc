@@ -400,3 +400,33 @@ TEST(c8_opcode, SUBN_no_borrow)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, SHL_right_0)
+{
+    uint8_t opcode[] = { 0x8C, 0x4E, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0xC] = 0x31;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+    EXPECT_EQ(c8->Vx[0xC], 0x31 << 1);
+    EXPECT_EQ(c8->Vx[0xF], 0x00);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, SHL_right_1)
+{
+    uint8_t opcode[] = { 0x8C, 0x4E, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0xC] = 0x81;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+    EXPECT_EQ(c8->Vx[0xC], 0x2);
+    EXPECT_EQ(c8->Vx[0xF], 0x01);
+
+    C8_free(&c8);
+}

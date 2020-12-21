@@ -144,4 +144,9 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // LD I, addr
         c8->I = BIT_LO_12(opcode);
     }
+    else if (BIT_HI_4(opcode) == 0xB)
+    {
+        // JP V0, addr
+        c8->PC = c8->Vx[0] + BIT_LO_12(opcode);
+    }
 }

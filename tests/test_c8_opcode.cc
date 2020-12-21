@@ -478,3 +478,29 @@ TEST(c8_opcode, LD_I)
 
     C8_free(&c8);
 }
+
+TEST(c8_opcode, JP_V0_no_overflow)
+{
+    uint8_t opcode[] = { 0xBA, 0x12, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0] = 0x43;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0xA12 + 0x43);
+
+    C8_free(&c8);
+}
+
+TEST(c8_opcode, JP_V0_overflow)
+{
+    uint8_t opcode[] = { 0xBF, 0x12, };
+    auto c8 = init_c8(opcode, NELEMS(opcode));
+
+    c8->Vx[0] = 0xFA;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, (0xF12 + 0xFA) & 0xFFFF);
+
+    C8_free(&c8);
+}

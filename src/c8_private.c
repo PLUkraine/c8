@@ -6,8 +6,11 @@
 
 void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
 {
+    // registers for commands 0x_XY_
+    uint8_t *Vx = c8->Vx + NIBBLE_3(opcode);
+    uint8_t *Vy = c8->Vx + NIBBLE_2(opcode);
 
-    if (opcode == 0x00E0) 
+    if (opcode == 0x00E0)
     {
         // CLS
         // TODO implement display
@@ -34,7 +37,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x3)
     {
         // SE VX, byte
-        if (c8->Vx[NIMB_3(opcode)] == BIT_LO_8(opcode))
+        if (*Vx == BIT_LO_8(opcode))
         {
             c8->PC += 2;
         }
@@ -42,7 +45,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x4)
     {
         // SNE VX, byte
-        if (c8->Vx[NIMB_3(opcode)] != BIT_LO_8(opcode))
+        if (*Vx != BIT_LO_8(opcode))
         {
             c8->PC += 2;
         }
@@ -51,7 +54,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_4(opcode) == 0x0)
     {
         // SE Vx, Vy
-        if (c8->Vx[NIMB_3(opcode)] == c8->Vx[NIMB_2(opcode)])
+        if (*Vx == *Vy)
         {
             c8->PC += 2;
         }
@@ -59,79 +62,79 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x6)
     {
         // LD Vx, byte
-        c8->Vx[NIMB_3(opcode)] = BIT_LO_8(opcode);
+        *Vx = BIT_LO_8(opcode);
     }
     else if (BIT_HI_4(opcode) == 0x7)
     {
         // ADD Vx, byte
         // note: no carry
-        c8->Vx[NIMB_3(opcode)] += BIT_LO_8(opcode);
+        *Vx += BIT_LO_8(opcode);
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x0)
     {
         // LD Vx, Vy
-        c8->Vx[NIMB_3(opcode)] = c8->Vx[NIMB_2(opcode)];
+        *Vx = *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x1)
     {
         // OR Vx, Vy
-        c8->Vx[NIMB_3(opcode)] |= c8->Vx[NIMB_2(opcode)];
+        *Vx |= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x2)
     {
         // AND Vx, Vy
-        c8->Vx[NIMB_3(opcode)] &= c8->Vx[NIMB_2(opcode)];
+        *Vx &= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x3)
     {
         // XOR Vx, Vy
-        c8->Vx[NIMB_3(opcode)] ^= c8->Vx[NIMB_2(opcode)];
+        *Vx ^= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x4)
     {
         // ADD Vx, Vy
-        uint16_t res = c8->Vx[NIMB_3(opcode)] + c8->Vx[NIMB_2(opcode)];
-        c8->Vx[NIMB_3(opcode)] = res;
+        uint16_t res = *Vx + *Vy;
+        *Vx = res;
         c8->Vx[0xF           ] = res > 0xFF;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x5)
     {
         // SUB Vx, Vy
-        c8->Vx[0xF           ]  = c8->Vx[NIMB_3(opcode)] > c8->Vx[NIMB_2(opcode)];
-        c8->Vx[NIMB_3(opcode)] -= c8->Vx[NIMB_2(opcode)];
+        c8->Vx[0xF           ]  = *Vx > *Vy;
+        *Vx -= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x6)
     {
         // SHR Vx {, Vy}
-        c8->Vx[0xF           ]   = LSB_BYTE(c8->Vx[NIMB_3(opcode)]);
-        c8->Vx[NIMB_3(opcode)] >>= 1;
+        c8->Vx[0xF           ]   = LSB_BYTE(*Vx);
+        *Vx >>= 1;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x7)
     {
         // SUBN Vx, Vy
-        c8->Vx[0xF           ] = c8->Vx[NIMB_3(opcode)] < c8->Vx[NIMB_2(opcode)];
-        c8->Vx[NIMB_3(opcode)] = c8->Vx[NIMB_2(opcode)] - c8->Vx[NIMB_3(opcode)];
+        c8->Vx[0xF           ] = *Vx < *Vy;
+        *Vx = *Vy - *Vx;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0xE)
     {
         // SHL Vx {, Vy}
-        c8->Vx[0xF           ]   = MSB_BYTE(c8->Vx[NIMB_3(opcode)]);
-        c8->Vx[NIMB_3(opcode)] <<= 1;
+        c8->Vx[0xF           ]   = MSB_BYTE(*Vx);
+        *Vx <<= 1;
     }
     else if (BIT_HI_4(opcode) == 0x9
           && BIT_LO_4(opcode) == 0xE)
     {
         // SNE Vx, Vy
-        if (c8->Vx[NIMB_3(opcode)] != c8->Vx[NIMB_2(opcode)])
+        if (*Vx != *Vy)
         {
             c8->PC += 2;
         }

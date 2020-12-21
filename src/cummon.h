@@ -8,8 +8,8 @@
 #define BIT_HI_4(x)  (((x) & 0xF000) >> 12)
 #define BIT_HI_8(x)  (((x) & 0xFF00) >> 8)
 #define BIT_HI_12(x) (((x) & 0xFFF0) >> 4)
-#define NIMB_3(x)    (((x) & 0x0F00) >> 8)
-#define NIMB_2(x)    (((x) & 0x00F0) >> 4)
+#define NIBBLE_3(x)  (((x) & 0x0F00) >> 8)
+#define NIBBLE_2(x)  (((x) & 0x00F0) >> 4)
 #define MSB_BYTE(x)  (((x) &   0x80) >> 7)
 #define LSB_BYTE(x)  ((x) &  0x0001)
 

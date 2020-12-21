@@ -7,7 +7,8 @@ extern "C"
 
 TEST(cummon_test, bit_defines)
 {
-    auto number = 0xBB2f56;
+    auto number   = 0xBB2f56;
+    auto number_2 = 0xFF8341;
     EXPECT_EQ(0x0f56, BIT_LO_12(number));
     EXPECT_EQ(0x0056, BIT_LO_8 (number));
     EXPECT_EQ(0x0006, BIT_LO_4 (number));
@@ -16,6 +17,10 @@ TEST(cummon_test, bit_defines)
     EXPECT_EQ( 0x2f5, BIT_HI_12(number));
     EXPECT_EQ(   0xf, NIMB_3   (number));
     EXPECT_EQ(   0x5, NIMB_2   (number));
+    EXPECT_EQ(   0x0, MSB      (number));
+    EXPECT_EQ(   0x0, LSB      (number));
+    EXPECT_EQ(   0x1, MSB      (number_2));
+    EXPECT_EQ(   0x1, LSB      (number_2));
 }
 
 TEST(c8_tests, init_free)

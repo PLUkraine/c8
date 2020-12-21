@@ -106,4 +106,11 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         c8->Vx[0xF           ]  = c8->Vx[NIMB_3(opcode)] > c8->Vx[NIMB_2(opcode)];
         c8->Vx[NIMB_3(opcode)] -= c8->Vx[NIMB_2(opcode)];
     }
+    else if (BIT_HI_4(opcode) == 0x8
+          && BIT_LO_4(opcode) == 0x6)
+    {
+        // SHR Vx {, Vy}
+        c8->Vx[0xF           ]  = LSB(c8->Vx[NIMB_3(opcode)]);
+        c8->Vx[NIMB_3(opcode)] >>= 1;
+    }
 }

@@ -139,4 +139,9 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             c8->PC += 2;
         }
     }
+    else if (BIT_HI_4(opcode) == 0xA)
+    {
+        // LD I, addr
+        c8->I = BIT_LO_12(opcode);
+    }
 }

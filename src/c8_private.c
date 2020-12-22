@@ -149,4 +149,9 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // JP V0, addr
         c8->PC = c8->Vx[0] + BIT_LO_12(opcode);
     }
+    else if (BIT_HI_4(opcode) == 0xC)
+    {
+        // RND Vx, byte
+        *Vx = C8_Random_next(c8->Random) & BIT_LO_8(opcode);
+    }
 }

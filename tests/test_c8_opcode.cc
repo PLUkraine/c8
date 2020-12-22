@@ -455,3 +455,27 @@ TEST_F(c8_opcode, JP_V0_overflow)
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, (0xF12 + 0xFA) & 0xFFFF);
 }
+
+TEST_F(c8_opcode, RND)
+{
+    uint8_t opcode[] = {
+        0xCC, 0xA1,
+        0xCC, 0xA1,
+        0xCC, 0xA1,
+        0xCC, 0xA1,
+    };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    auto rnd = C8_Random_new(TEST_SEED);
+
+    for (int i=0; i<4; ++i)
+    {
+        uint8_t val = C8_Random_next(rnd) & 0xA1;
+        C8_cycle(c8);
+        EXPECT_EQ(val, c8->Vx[0xC]);
+    }
+
+    EXPECT_EQ(c8->PC, 0x200 + 4*2);
+
+    C8_Random_free(&rnd);
+}

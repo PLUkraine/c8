@@ -1,6 +1,6 @@
-#include <assert.h>
-
 #include "c8_private.h"
+
+#include <assert.h>
 #include "cummon.h"
 
 

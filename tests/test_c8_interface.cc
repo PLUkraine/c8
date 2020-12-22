@@ -23,18 +23,35 @@ TEST(cummon_test, bit_defines)
     EXPECT_EQ(   0x1, LSB_BYTE (number_2));
 }
 
-TEST(c8_tests, init_free)
+static const uint32_t TEST_SEED = 42;
+
+class c8_tests : public ::testing::Test {
+protected:
+    C8_Random_ptr rnd;
+
+    c8_tests()
+    {
+        rnd = C8_Random_new(TEST_SEED);
+    }
+    virtual ~c8_tests()
+    {
+        C8_Random_free(&rnd);
+    }
+};
+
+
+TEST_F(c8_tests, init_free)
 {
-    auto c8 = C8_init();
+    auto c8 = C8_init(rnd);
     EXPECT_NE(c8, nullptr);
     EXPECT_NE(c8->Ram, nullptr);
     C8_free(&c8);
     EXPECT_EQ(c8, nullptr);
 }
 
-TEST(c8_tests, reset)
+TEST_F(c8_tests, reset)
 {
-    auto c8 = C8_init();
+    auto c8 = C8_init(rnd);
 
     C8_reset(c8);
     EXPECT_EQ(c8->PC,           0x200);
@@ -45,9 +62,9 @@ TEST(c8_tests, reset)
     C8_free(&c8);
 }
 
-TEST(c8_tests, load_program)
+TEST_F(c8_tests, load_program)
 {
-    auto c8 = C8_init();
+    auto c8 = C8_init(rnd);
 
     C8_reset(c8);
     char data[] = "pidora lol";

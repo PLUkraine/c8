@@ -28,18 +28,22 @@ static const uint8_t C8_DIGITS[] = {
 };
 
 // 3.5795 MHz?
-C8_ptr C8_init(void)
+C8_ptr C8_init(C8_Random_ptr rnd)
 {
+    assert(rnd);
+
     void *malloc_call = NULL;
     C8_ptr c8 = NULL;
 
     malloc_call = malloc(sizeof(*c8));
     assert(malloc_call);
     c8 = (C8_ptr) malloc_call;
-    
+
     malloc_call = malloc(C8_LAST_ADDR + 1);
     assert(malloc_call);
     c8->Ram = (uint8_t *)malloc_call;
+
+    c8->Random = rnd;
 
     return c8;
 }

@@ -30,6 +30,15 @@ protected:
     }
 };
 
+TEST_F(c8_opcode, CLS)
+{
+    uint8_t opcode[] = { 0x00, 0xE0, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    C8_cycle(c8);
+    FAIL();
+}
+
 TEST_F(c8_opcode, SYS)
 {
     uint8_t opcode[] = { 0x0A, 0xBC, };

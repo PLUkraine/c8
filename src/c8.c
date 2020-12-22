@@ -89,6 +89,6 @@ void C8_cycle (C8_ptr c8)
 void C8_timers(C8_ptr c8)
 {
     assert(c8);
-    if (c8->DT-- == 0) c8->DT = 0;
-    if (c8->ST-- == 0) c8->ST = 0;
+    if (c8->DT != 0) c8->DT--;
+    if (c8->ST != 0) c8->ST--;
 }

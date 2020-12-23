@@ -85,20 +85,20 @@ TEST_F(c8_tests, assertion_tests)
     char data[] = "lol";
 
     // init and free
-    EXPECT_DEATH(C8_init(NULL), "Assertion `rnd' failed");
-    EXPECT_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
-    EXPECT_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
+    EXPECT_DEBUG_DEATH(C8_init(NULL), "Assertion `rnd' failed");
+    EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
+    EXPECT_DEBUG_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
 
     // reset
-    EXPECT_DEATH(C8_reset(NULL), "Assertion `c8' failed");
+    EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 
     // load
-    EXPECT_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
-    EXPECT_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
-    EXPECT_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
+    EXPECT_DEBUG_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
+    EXPECT_DEBUG_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
+    EXPECT_DEBUG_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
 
     // cycle
-    EXPECT_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
 
     C8_free(&c8);
 }

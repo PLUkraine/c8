@@ -37,6 +37,8 @@ void C8_Random_free(C8_Random_ptr *rnd)
 
 uint32_t C8_Random_next(C8_Random_ptr rnd)
 {
+    assert(rnd);
+
     uint32_t mangled = rnd->pos++;
     mangled *= BIT_NOISE_1;
     mangled += rnd->seed;

@@ -6,7 +6,7 @@
 
 void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
 {
-    // registers for commands 0x_XY_
+    // registers for commands _XY_
     uint8_t *Vx = c8->Vx + NIBBLE_3(opcode);
     uint8_t *Vy = c8->Vx + NIBBLE_2(opcode);
 
@@ -153,5 +153,15 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // RND Vx, byte
         *Vx = C8_Random_next(c8->Random) & BIT_LO_8(opcode);
+    }
+    else if (BIT_HI_4(opcode) == 0xD)
+    {
+        // DRW 
+        // TODO implement
+        assert(0);
+    }
+    else {
+        // Invalid opcode - crash the app
+        assert(0);
     }
 }

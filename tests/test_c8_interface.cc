@@ -47,17 +47,11 @@ TEST_F(c8_tests, init_free)
     EXPECT_NE(c8->Ram, nullptr);
     C8_free(&c8);
     EXPECT_EQ(c8, nullptr);
-
-    EXPECT_DEATH(C8_init(NULL), "Assertion `rnd' failed");
-    EXPECT_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
-    EXPECT_DEATH(C8_free(&c8),  "Assertion `c8 && \\*c8' failed");
 }
 
 TEST_F(c8_tests, reset)
 {
     auto c8 = C8_init(rnd);
-
-    EXPECT_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 
     C8_reset(c8);
     EXPECT_EQ(c8->PC,           0x200);
@@ -75,15 +69,36 @@ TEST_F(c8_tests, load_program)
     C8_reset(c8);
     char data[] = "pidora lol";
 
-    EXPECT_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
-    EXPECT_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
-    EXPECT_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
-
     C8_load_program(c8, (uint8_t *)data, strlen(data));
     for (size_t i=0; i<NELEMS(data); ++i)
     {
         EXPECT_EQ(c8->Ram[0x200+i], data[i]);
     }
+
+    C8_free(&c8);
+}
+
+TEST_F(c8_tests, assertion_tests)
+{
+    auto c8 = C8_init(rnd);
+    C8_ptr empty = NULL;
+    char data[] = "lol";
+
+    // init and free
+    EXPECT_DEATH(C8_init(NULL), "Assertion `rnd' failed");
+    EXPECT_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
+    EXPECT_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
+
+    // reset
+    EXPECT_DEATH(C8_reset(NULL), "Assertion `c8' failed");
+
+    // load
+    EXPECT_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
+    EXPECT_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
+    EXPECT_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
+
+    // cycle
+    EXPECT_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
 
     C8_free(&c8);
 }

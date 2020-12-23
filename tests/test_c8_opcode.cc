@@ -30,7 +30,7 @@ protected:
     }
 };
 
-TEST_F(c8_opcode, CLS)
+TEST_F(c8_opcode, DISABLED_CLS)
 {
     uint8_t opcode[] = { 0x00, 0xE0, };
     C8_load_program(c8, opcode, NELEMS(opcode));
@@ -487,4 +487,13 @@ TEST_F(c8_opcode, RND)
     EXPECT_EQ(c8->PC, 0x200 + 4*2);
 
     C8_Random_free(&rnd);
+}
+
+TEST_F(c8_opcode, DISABLED_DRW)
+{
+    uint8_t opcode[] = { 0xDB, 0xA8, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    C8_cycle(c8);
+    FAIL();
 }

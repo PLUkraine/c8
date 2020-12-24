@@ -582,26 +582,26 @@ TEST_F(c8_opcode, LD_Vx_DT)
     EXPECT_EQ(c8->PC, 0x202);
 }
 
-TEST_F(c8_opcode, DISABLED_LD_Vx_K)
+TEST_F(c8_opcode, LD_Vx_K)
 {
     //                   block       JMP 0x204
     uint8_t opcode[] = { 0xF8, 0x0A, 0xB2, 0x04, };
     C8_load_program(c8, opcode, NELEMS(opcode));
     
+    // set key first, shouldn't unblock
     c8->Vx[0x8] = 0;
     C8_set_key(c8, 0xA, 1);
 
     // block execution until key is pressed
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, 0x202);
-    // shouldn't execute until key is pressed
     for (int i=0; i<100; ++i)
     {
         C8_cycle(c8);
         ASSERT_EQ(c8->PC, 0x202);
     }
 
-    // key was not pressed
+    // key was not pressed, should block
     C8_set_key(c8, 0xB, 0);
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, 0x202);

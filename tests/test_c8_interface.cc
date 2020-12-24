@@ -158,11 +158,26 @@ TEST_F(c8_tests, cycle)
     c8->WriteKeyToRegistry = NELEMS(c8->Vx) + 1;
     EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 
+    // won't execute until key was pressed
     c8->WriteKeyToRegistry = NELEMS(c8->Vx);
     for (int i=0; i<100; ++i) {
         C8_cycle(c8);
         ASSERT_EQ(c8->PC, 0x200);
     }
+
+    //               JP 0x202
+    uint8_t data[] = {0x12, 0x02,};
+    C8_load_program(c8, data, NELEMS(data));
+
+    // setting key to 0 shoudn't remove lock
+    C8_set_key(c8, NELEMS(c8->Vx)-1, 0);
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x200);
+
+    // setting key to 1 unlocks execution
+    C8_set_key(c8, NELEMS(c8->Vx)-1, 1);
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
 
     C8_free(&c8);
 }

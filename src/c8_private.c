@@ -11,7 +11,7 @@ uint8_t C8_is_waiting_for_key(C8_ptr c8)
     return c8->WriteKeyToRegistry > 0;
 }
 
-void C8_set_write_to_registry(C8_ptr c8, uint8_t reg)
+void C8_set_key_lock(C8_ptr c8, uint8_t reg)
 {
     assert(reg < NELEMS(c8->Vx));
     assert(c8->WriteKeyToRegistry == 0x00);
@@ -32,7 +32,8 @@ void C8_remove_key_lock(C8_ptr c8, uint8_t key)
 void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
 {
     // registers for commands _XY_
-    uint8_t *Vx = c8->Vx + NIBBLE_3(opcode);
+    uint8_t   X = NIBBLE_3(opcode);
+    uint8_t *Vx = c8->Vx + X;
     uint8_t *Vy = c8->Vx + NIBBLE_2(opcode);
 
     if (opcode == 0x00E0)
@@ -213,8 +214,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x0A)
     {
         // LD Vx, K
-        // TODO refactor and implement
-        assert(0);
+        C8_set_key_lock(c8, X);
     }
     else {
         // Invalid opcode - crash the app

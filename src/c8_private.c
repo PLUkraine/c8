@@ -216,6 +216,12 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // LD Vx, K
         C8_set_key_lock(c8, X);
     }
+    else if (BIT_HI_4(opcode) == 0xF
+          && BIT_LO_8(opcode) == 0x15)
+    {
+        // LD DT, Vx
+        c8->DT = *Vx;
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

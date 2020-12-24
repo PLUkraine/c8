@@ -613,3 +613,15 @@ TEST_F(c8_opcode, LD_Vx_K)
     ASSERT_EQ(c8->PC, 0x204);
     ASSERT_EQ(c8->Vx[0x8], 0xB);
 }
+
+TEST_F(c8_opcode, LD_DT_Vx)
+{
+    uint8_t opcode[] = { 0xF8, 0x15, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[0x8] = 0x18;
+    
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Vx[0x08], c8->DT);
+    EXPECT_EQ(c8->PC, 0x202);
+}

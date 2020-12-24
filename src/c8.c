@@ -65,6 +65,7 @@ void C8_reset(C8_ptr c8)
     c8->SP = 0;
     c8->ST = 0;
     memset(c8->Vx, 0x00, NELEMS(c8->Vx));
+    memset(c8->Key, 0x00, NELEMS(c8->Key));
     memcpy(c8->Ram, C8_DIGITS, NELEMS(C8_DIGITS));
 }
 
@@ -91,4 +92,14 @@ void C8_timers(C8_ptr c8)
     assert(c8);
     if (c8->DT != 0) c8->DT--;
     if (c8->ST != 0) c8->ST--;
+}
+
+
+void C8_set_key(C8_ptr c8, uint8_t key, uint8_t state)
+{
+    assert(c8);
+    assert(key < NELEMS(c8->Key));
+    assert(state == 0 || state == 1);
+
+    c8->Key[key] = state;
 }

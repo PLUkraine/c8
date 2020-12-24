@@ -58,6 +58,10 @@ TEST_F(c8_tests, reset)
     EXPECT_EQ(c8->Ram[0],       0xF0);
     EXPECT_EQ(c8->Ram[16*5-1],  0x80);
     EXPECT_EQ(c8->Ram[16*5],    0x00);
+    for (size_t i=0; i<NELEMS(c8->Key); ++i)
+    {
+        EXPECT_EQ(c8->Key[i], 0x00);
+    }
 
     C8_free(&c8);
 }
@@ -74,6 +78,21 @@ TEST_F(c8_tests, load_program)
     {
         EXPECT_EQ(c8->Ram[0x200+i], data[i]);
     }
+
+    C8_free(&c8);
+}
+
+TEST_F(c8_tests, set_key)
+{
+    auto c8 = C8_init(rnd);
+
+    C8_reset(c8);
+    C8_set_key(c8, 3, 1);
+    EXPECT_EQ(c8->Key[3], 1);
+    C8_set_key(c8, 0xF, 1);
+    EXPECT_EQ(c8->Key[0xF], 1);
+    C8_set_key(c8, 3, 0);
+    EXPECT_EQ(c8->Key[3], 0);
 
     C8_free(&c8);
 }
@@ -99,6 +118,11 @@ TEST_F(c8_tests, assertion_tests)
 
     // cycle
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
+
+    // set key
+    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, 0), "Assertion `c8' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, 0), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(c8, 0, 2), "Assertion `state == 0 || state == 1' failed");
 
     C8_free(&c8);
 }

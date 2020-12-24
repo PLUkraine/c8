@@ -160,6 +160,13 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // TODO implement
         assert(0);
     }
+    else if (BIT_HI_4(opcode) == 0xE
+          && BIT_LO_8(opcode) == 0x9E)
+    {
+        // SKP Vx
+        // TODO implement
+        assert(0);
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

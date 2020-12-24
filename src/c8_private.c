@@ -228,6 +228,12 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // LD ST, Vx
         c8->ST = *Vx;
     }
+    else if (BIT_HI_4(opcode) == 0xF
+          && BIT_LO_8(opcode) == 0x1E)
+    {
+        // ADD I, Vx -> No Overflow Flag!
+        c8->I += *Vx;
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

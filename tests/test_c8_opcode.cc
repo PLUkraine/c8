@@ -637,3 +637,18 @@ TEST_F(c8_opcode, LD_ST_Vx)
     EXPECT_EQ(c8->Vx[0x08], c8->ST);
     EXPECT_EQ(c8->PC, 0x202);
 }
+
+TEST_F(c8_opcode, ADD_I_Vx)
+{
+    uint8_t opcode[] = { 0xF8, 0x1E, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    // CONSIDER what happens when I >= 0x1000?
+    // CONSIDER what happens when I owerflows?
+    c8->Vx[0x8] = 0x25;
+    c8->I = 0x0FFA;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->I, (0x0FFA + 0x25));
+    EXPECT_EQ(c8->PC, 0x202);
+}

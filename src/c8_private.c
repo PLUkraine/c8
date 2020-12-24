@@ -4,6 +4,31 @@
 #include "cummon.h"
 
 
+uint8_t C8_is_waiting_for_key(C8_ptr c8)
+{
+    assert(c8->WriteKeyToRegistry <= NELEMS(c8->Vx));
+
+    return c8->WriteKeyToRegistry > 0;
+}
+
+void C8_set_write_to_registry(C8_ptr c8, uint8_t reg)
+{
+    assert(reg < NELEMS(c8->Vx));
+    assert(c8->WriteKeyToRegistry == 0x00);
+
+    c8->WriteKeyToRegistry = reg + 1;
+}
+
+void C8_remove_key_lock(C8_ptr c8, uint8_t key)
+{
+    assert(0 < c8->WriteKeyToRegistry && c8->WriteKeyToRegistry <= NELEMS(c8->Vx));
+    assert(key < NELEMS(c8->Key));
+
+    c8->Vx[c8->WriteKeyToRegistry - 1] = key;
+    c8->WriteKeyToRegistry = 0x00;
+}
+
+
 void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
 {
     // registers for commands _XY_

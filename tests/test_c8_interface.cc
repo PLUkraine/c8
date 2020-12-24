@@ -155,10 +155,10 @@ TEST_F(c8_tests, cycle)
     C8_reset(c8);
 
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
-    c8->WriteKeyToRegistry = 0x11;
+    c8->WriteKeyToRegistry = NELEMS(c8->Vx) + 1;
     EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 
-    c8->WriteKeyToRegistry = 0x10;
+    c8->WriteKeyToRegistry = NELEMS(c8->Vx);
     for (int i=0; i<100; ++i) {
         C8_cycle(c8);
         ASSERT_EQ(c8->PC, 0x200);

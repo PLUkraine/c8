@@ -85,7 +85,7 @@ void C8_cycle (C8_ptr c8)
     assert(c8->WriteKeyToRegistry <= 0x10);
 
     // skip if waiting for key
-    if (c8->WriteKeyToRegistry) {
+    if (C8_is_waiting_for_key(c8)) {
         return;
     }
     
@@ -108,9 +108,8 @@ void C8_set_key(C8_ptr c8, uint8_t key, uint8_t state)
     assert(key < NELEMS(c8->Key));
     assert(state == 0 || state == 1);
 
-    if (c8->WriteKeyToRegistry && state) {
-        c8->Vx[c8->WriteKeyToRegistry - 1] = key;
-        c8->WriteKeyToRegistry = 0x00;
+    if (C8_is_waiting_for_key(c8) && state) {
+        C8_remove_key_lock(c8, key);
     }
 
     c8->Key[key] = state;

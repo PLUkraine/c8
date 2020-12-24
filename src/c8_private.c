@@ -164,8 +164,10 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x9E)
     {
         // SKP Vx
-        // TODO implement
-        assert(0);
+        if (*Vx < NELEMS(c8->Key) && c8->Key[*Vx])
+        {
+            c8->PC += 2;
+        }
     }
     else {
         // Invalid opcode - crash the app

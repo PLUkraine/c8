@@ -60,10 +60,11 @@ TEST_F(c8_tests, reset)
     EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 
     C8_reset(c8);
-    EXPECT_EQ(c8->PC,           0x200);
-    EXPECT_EQ(c8->Ram[0],       0xF0);
-    EXPECT_EQ(c8->Ram[16*5-1],  0x80);
-    EXPECT_EQ(c8->Ram[16*5],    0x00);
+    EXPECT_EQ(c8->PC,                 0x200);
+    EXPECT_EQ(c8->Ram[0],             0xF0);
+    EXPECT_EQ(c8->Ram[16*5-1],        0x80);
+    EXPECT_EQ(c8->Ram[16*5],          0x00);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
     for (size_t i=0; i<NELEMS(c8->Key); ++i)
     {
         EXPECT_EQ(c8->Key[i], 0x00);
@@ -104,15 +105,64 @@ TEST_F(c8_tests, set_key)
 
     C8_set_key(c8, 3, 1);
     EXPECT_EQ(c8->Key[3], 1);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
     C8_set_key(c8, 0xF, 1);
     EXPECT_EQ(c8->Key[0xF], 1);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
     C8_set_key(c8, 3, 0);
     EXPECT_EQ(c8->Key[3], 0);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
 
     C8_free(&c8);
 }
 
-TEST_F(c8_tests, cycle_assertion)
+TEST_F(c8_tests, set_key_wait)
 {
+    auto c8 = C8_init(rnd);
+    C8_reset(c8);
+    
+    c8->Vx[0xA] = 0x00;
+    c8->WriteKeyToRegistry = 0xA + 1;
+    // no reaction
+    C8_set_key(c8, 3, 0);
+    EXPECT_EQ(c8->Vx[0xA], 0);
+    EXPECT_EQ(c8->Key[3], 0);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0xA + 1);
+
+    // set Vx[0xA] = 0x3
+    C8_set_key(c8, 0x3, 1);
+    EXPECT_EQ(c8->Vx[0xA], 0x3);
+    EXPECT_EQ(c8->Key[3], 0x1);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
+
+    // no change
+    C8_set_key(c8, 0x4, 1);
+    EXPECT_EQ(c8->Vx[0xA], 0x3);
+    EXPECT_EQ(c8->Key[4], 0x1);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
+    C8_set_key(c8, 0x3, 0);
+    EXPECT_EQ(c8->Vx[0xA], 0x3);
+    EXPECT_EQ(c8->Key[3], 0x0);
+    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
+
+    C8_free(&c8);
+}
+
+TEST_F(c8_tests, cycle)
+{
+    auto c8 = C8_init(rnd);
+
+    C8_reset(c8);
+
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
+    c8->WriteKeyToRegistry = 0x11;
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
+
+    c8->WriteKeyToRegistry = 0x10;
+    for (int i=0; i<100; ++i) {
+        C8_cycle(c8);
+        ASSERT_EQ(c8->PC, 0x200);
+    }
+
+    C8_free(&c8);
 }

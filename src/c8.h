@@ -18,6 +18,8 @@ struct C8_T {
     uint8_t      *Ram;
     C8_Random_ptr Random;
     uint8_t       Key[16];
+
+    uint8_t       WriteKeyToRegistry;
 };
 
 typedef struct C8_T *C8_ptr;

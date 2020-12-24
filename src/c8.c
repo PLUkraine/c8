@@ -64,6 +64,7 @@ void C8_reset(C8_ptr c8)
     c8->PC = C8_START_ADDR;
     c8->SP = 0;
     c8->ST = 0;
+    c8->WriteKeyToRegistry = 0x00;
     memset(c8->Vx, 0x00, NELEMS(c8->Vx));
     memset(c8->Key, 0x00, NELEMS(c8->Key));
     memcpy(c8->Ram, C8_DIGITS, NELEMS(C8_DIGITS));
@@ -81,6 +82,12 @@ void C8_cycle (C8_ptr c8)
 {
     assert(c8);
     assert(!(c8->PC & 1));
+    assert(c8->WriteKeyToRegistry <= 0x10);
+
+    // skip if waiting for key
+    if (c8->WriteKeyToRegistry) {
+        return;
+    }
     
     uint16_t opcode = (c8->Ram[c8->PC] << 8) | c8->Ram[c8->PC+1];
     c8->PC += 2;
@@ -100,6 +107,11 @@ void C8_set_key(C8_ptr c8, uint8_t key, uint8_t state)
     assert(c8);
     assert(key < NELEMS(c8->Key));
     assert(state == 0 || state == 1);
+
+    if (c8->WriteKeyToRegistry && state) {
+        c8->Vx[c8->WriteKeyToRegistry - 1] = key;
+        c8->WriteKeyToRegistry = 0x00;
+    }
 
     c8->Key[key] = state;
 }

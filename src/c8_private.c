@@ -222,6 +222,12 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // LD DT, Vx
         c8->DT = *Vx;
     }
+    else if (BIT_HI_4(opcode) == 0xF
+          && BIT_LO_8(opcode) == 0x18)
+    {
+        // LD ST, Vx
+        c8->ST = *Vx;
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

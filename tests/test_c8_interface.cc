@@ -47,11 +47,17 @@ TEST_F(c8_tests, init_free)
     EXPECT_NE(c8->Ram, nullptr);
     C8_free(&c8);
     EXPECT_EQ(c8, nullptr);
+
+    EXPECT_DEBUG_DEATH(C8_init(NULL), "Assertion `rnd' failed");
+    EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
+    EXPECT_DEBUG_DEATH(C8_free(&c8),  "Assertion `c8 && \\*c8' failed");
 }
 
 TEST_F(c8_tests, reset)
 {
     auto c8 = C8_init(rnd);
+
+    EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 
     C8_reset(c8);
     EXPECT_EQ(c8->PC,           0x200);
@@ -73,6 +79,10 @@ TEST_F(c8_tests, load_program)
     C8_reset(c8);
     char data[] = "pidora lol";
 
+    EXPECT_DEBUG_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
+    EXPECT_DEBUG_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
+    EXPECT_DEBUG_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
+
     C8_load_program(c8, (uint8_t *)data, strlen(data));
     for (size_t i=0; i<NELEMS(data); ++i)
     {
@@ -87,6 +97,11 @@ TEST_F(c8_tests, set_key)
     auto c8 = C8_init(rnd);
 
     C8_reset(c8);
+
+    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, 0), "Assertion `c8' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, 0), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(c8, 0, 2), "Assertion `state == 0 || state == 1' failed");
+
     C8_set_key(c8, 3, 1);
     EXPECT_EQ(c8->Key[3], 1);
     C8_set_key(c8, 0xF, 1);
@@ -97,32 +112,7 @@ TEST_F(c8_tests, set_key)
     C8_free(&c8);
 }
 
-TEST_F(c8_tests, assertion_tests)
+TEST_F(c8_tests, cycle_assertion)
 {
-    auto c8 = C8_init(rnd);
-    C8_ptr empty = NULL;
-    char data[] = "lol";
-
-    // init and free
-    EXPECT_DEBUG_DEATH(C8_init(NULL), "Assertion `rnd' failed");
-    EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
-    EXPECT_DEBUG_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
-
-    // reset
-    EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
-
-    // load
-    EXPECT_DEBUG_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
-    EXPECT_DEBUG_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
-    EXPECT_DEBUG_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
-
-    // cycle
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
-
-    // set key
-    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, 0), "Assertion `c8' failed");
-    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, 0), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
-    EXPECT_DEBUG_DEATH(C8_set_key(c8, 0, 2), "Assertion `state == 0 || state == 1' failed");
-
-    C8_free(&c8);
 }

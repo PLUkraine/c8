@@ -534,3 +534,39 @@ TEST_F(c8_opcode, SKP_Vx_too_big)
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x202);
 }
+
+TEST_F(c8_opcode, SKNP_Vx_skip)
+{
+    uint8_t opcode[] = { 0xEA, 0xA1, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[0xA] = 3;
+
+    C8_set_key(c8, 0x3, 0);
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x204);
+}
+
+TEST_F(c8_opcode, SKNP_Vx_no_skip)
+{
+    uint8_t opcode[] = { 0xEA, 0xA1, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[0xA] = 3;
+
+    C8_set_key(c8, 0x3, 1);
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+}
+
+TEST_F(c8_opcode, SKNP_Vx_too_big)
+{
+    uint8_t opcode[] = { 0xEA, 0xA1, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[0xA] = 17;
+
+    C8_set_key(c8, 0xA, 1);
+    C8_cycle(c8);
+    EXPECT_EQ(c8->PC, 0x202);
+}

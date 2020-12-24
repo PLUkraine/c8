@@ -169,6 +169,15 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             c8->PC += 2;
         }
     }
+    else if (BIT_HI_4(opcode) == 0xE
+          && BIT_LO_8(opcode) == 0xA1)
+    {
+        // SKNP Vx
+        if (*Vx < NELEMS(c8->Key) && !c8->Key[*Vx])
+        {
+            c8->PC += 2;
+        }
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

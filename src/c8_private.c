@@ -259,6 +259,17 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             vx /= 10;
         }
     }
+    else if (BIT_HI_4(opcode) == 0xF
+          && BIT_LO_8(opcode) == 0x55)
+    {
+        // LD [I], Vx
+        assert(c8->I + X <= C8_LAST_ADDR);
+
+        int i;
+        for (i=0; i<=X; ++i) {
+            c8->Ram[c8->I + i] = c8->Vx[i];
+        }
+    }
     else {
         // Invalid opcode - crash the app
         assert(0);

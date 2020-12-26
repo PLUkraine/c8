@@ -18,6 +18,22 @@ protected:
     c8_opcode() {}
     virtual ~c8_opcode() {}
 
+
+    void compare_ram_to_regs(uint8_t reg)
+    {
+        for (size_t i=0; i<NELEMS(c8->Vx); ++i)    
+        {
+            int ram = c8->Ram[c8->I + i];
+            int act = c8->Vx[i];
+            if (i <= reg) {
+                EXPECT_EQ(ram, act);
+            } else {
+                EXPECT_NE(ram, act);
+            }
+        }
+    }
+
+
     virtual void SetUp()
     {
         _rnd = C8_Random_new(TEST_SEED);
@@ -732,6 +748,33 @@ TEST_F(c8_opcode, LD_B_Vx_I_overflow)
 
     c8->I = 0x0FFE;
     c8->Vx[0xC] = 0x9;
+
+    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+}
+
+TEST_F(c8_opcode, LD_Ram_Vx_normal)
+{
+    uint8_t opcode[] = { 0xFB, 0x55, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    uint8_t start_val = 0x60;
+    c8->I = 0x0515;
+    for (size_t i=0; i<NELEMS(c8->Vx); ++i)
+    {
+        c8->Vx[i] = start_val + i;
+    }
+
+    C8_cycle(c8);
+    compare_ram_to_regs(0xB);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+}
+
+TEST_F(c8_opcode, LD_Ram_Vx_overflow)
+{
+    uint8_t opcode[] = { 0xFB, 0x55, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->I = C8_LAST_ADDR - 0xA;
 
     EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
 }

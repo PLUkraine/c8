@@ -522,7 +522,7 @@ TEST_F(c8_opcode, SKP_Vx_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, 1);
+    C8_set_key(c8, 0x3, true);
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
@@ -534,7 +534,7 @@ TEST_F(c8_opcode, SKP_Vx_no_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, 0);
+    C8_set_key(c8, 0x3, false);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -546,7 +546,7 @@ TEST_F(c8_opcode, SKP_Vx_too_big)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 17;
-    C8_set_key(c8, 0xA, 1);
+    C8_set_key(c8, 0xA, true);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -558,7 +558,7 @@ TEST_F(c8_opcode, SKNP_Vx_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, 0);
+    C8_set_key(c8, 0x3, false);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
@@ -570,7 +570,7 @@ TEST_F(c8_opcode, SKNP_Vx_no_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, 1);
+    C8_set_key(c8, 0x3, true);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -582,7 +582,7 @@ TEST_F(c8_opcode, SKNP_Vx_too_big)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 17;
-    C8_set_key(c8, 0xA, 1);
+    C8_set_key(c8, 0xA, true);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -608,7 +608,7 @@ TEST_F(c8_opcode, LD_Vx_K)
     
     // set key first, shouldn't unblock
     c8->Vx[0x8] = 0;
-    C8_set_key(c8, 0xA, 1);
+    C8_set_key(c8, 0xA, true);
 
     // block execution until key is pressed
     C8_cycle(c8);
@@ -620,13 +620,13 @@ TEST_F(c8_opcode, LD_Vx_K)
     }
 
     // key was not pressed, should block
-    C8_set_key(c8, 0xB, 0);
+    C8_set_key(c8, 0xB, false);
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, C8_START_ADDR + 0x02);
     ASSERT_EQ(c8->Vx[0x8], 0);
 
     // key was pressed
-    C8_set_key(c8, 0xB, 1);
+    C8_set_key(c8, 0xB, true);
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, C8_START_ADDR + 0x04);
     ASSERT_EQ(c8->Vx[0x8], 0xB);

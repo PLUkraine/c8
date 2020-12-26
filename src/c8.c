@@ -99,15 +99,14 @@ void C8_timers(C8_ptr c8)
 }
 
 
-void C8_set_key(C8_ptr c8, uint8_t key, uint8_t state)
+void C8_set_key(C8_ptr c8, uint8_t key, bool is_down)
 {
     assert(c8);
     assert(key < NELEMS(c8->Key));
-    assert(state == 0 || state == 1);
 
-    if (C8_is_waiting_for_key(c8) && state) {
+    if (C8_is_waiting_for_key(c8) && is_down) {
         C8_remove_key_lock(c8, key);
     }
 
-    c8->Key[key] = state;
+    c8->Key[key] = is_down;
 }

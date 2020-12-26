@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "c8_random.h"
 
@@ -17,7 +18,7 @@ struct C8_T {
     uint16_t      Stack[16];
     uint8_t      *Ram;
     C8_Random_ptr Random;
-    uint8_t       Key[16];
+    bool          Key[16];
 
     uint8_t       WriteKeyToRegistry;
 };
@@ -31,6 +32,6 @@ extern void     C8_reset        (C8_ptr c8);
 extern void     C8_load_program (C8_ptr c8, const uint8_t *data, size_t n);
 extern void     C8_cycle        (C8_ptr c8);
 extern void     C8_timers       (C8_ptr c8);
-extern void     C8_set_key      (C8_ptr c8, uint8_t key, uint8_t state);
+extern void     C8_set_key      (C8_ptr c8, uint8_t key, bool is_down);
 
 #endif // C8_H_INCLUDED

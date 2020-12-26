@@ -99,17 +99,16 @@ TEST_F(c8_tests, set_key)
 
     C8_reset(c8);
 
-    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, 0), "Assertion `c8' failed");
-    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, 0), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
-    EXPECT_DEBUG_DEATH(C8_set_key(c8, 0, 2), "Assertion `state == 0 || state == 1' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, false), "Assertion `c8' failed");
+    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, false), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
 
-    C8_set_key(c8, 3, 1);
+    C8_set_key(c8, 3, true);
     EXPECT_EQ(c8->Key[3], 1);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-    C8_set_key(c8, 0xF, 1);
+    C8_set_key(c8, 0xF, true);
     EXPECT_EQ(c8->Key[0xF], 1);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-    C8_set_key(c8, 3, 0);
+    C8_set_key(c8, 3, false);
     EXPECT_EQ(c8->Key[3], 0);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
 
@@ -124,25 +123,25 @@ TEST_F(c8_tests, set_key_wait)
     c8->Vx[0xA] = 0x00;
     c8->WriteKeyToRegistry = 0xA + 1;
     // no reaction
-    C8_set_key(c8, 3, 0);
+    C8_set_key(c8, 3, false);
     EXPECT_EQ(c8->Vx[0xA], 0);
-    EXPECT_EQ(c8->Key[3], 0);
+    EXPECT_EQ(c8->Key[3], false);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0xA + 1);
 
     // set Vx[0xA] = 0x3
-    C8_set_key(c8, 0x3, 1);
+    C8_set_key(c8, 0x3, true);
     EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[3], 0x1);
+    EXPECT_EQ(c8->Key[3], true);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
 
     // no change
-    C8_set_key(c8, 0x4, 1);
+    C8_set_key(c8, 0x4, true);
     EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[4], 0x1);
+    EXPECT_EQ(c8->Key[4], true);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
-    C8_set_key(c8, 0x3, 0);
+    C8_set_key(c8, 0x3, false);
     EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[3], 0x0);
+    EXPECT_EQ(c8->Key[3], false);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
 
     C8_free(&c8);
@@ -169,13 +168,13 @@ TEST_F(c8_tests, cycle)
     uint8_t data[] = {0x12, 0x02,};
     C8_load_program(c8, data, NELEMS(data));
 
-    // setting key to 0 shoudn't remove lock
-    C8_set_key(c8, NELEMS(c8->Vx)-1, 0);
+    // releasing the key shoudn't remove the lock
+    C8_set_key(c8, NELEMS(c8->Vx)-1, false);
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x200);
 
-    // setting key to 1 unlocks execution
-    C8_set_key(c8, NELEMS(c8->Vx)-1, 1);
+    // key press unlocks execution
+    C8_set_key(c8, NELEMS(c8->Vx)-1, true);
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x202);
 

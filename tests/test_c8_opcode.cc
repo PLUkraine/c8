@@ -12,8 +12,9 @@ const uint32_t TEST_SEED = 4;
 
 class c8_opcode : public ::testing::Test {
 protected:
-    C8_Random_ptr _rnd;
-    C8_ptr          c8;
+    C8_Random_ptr  _rnd;
+    C8_Display_ptr disp;
+    C8_ptr           c8;
 
     c8_opcode() {}
     virtual ~c8_opcode() {}
@@ -36,8 +37,9 @@ protected:
 
     virtual void SetUp()
     {
+        disp = C8_Display_init();
         _rnd = C8_Random_new(TEST_SEED);
-        c8  = C8_init(_rnd);
+        c8  = C8_init(_rnd, disp);
         C8_reset(c8);
     }
 
@@ -45,6 +47,7 @@ protected:
     {
         C8_free(&c8);
         C8_Random_free(&_rnd);
+        C8_Display_free(&disp);
     }
 };
 

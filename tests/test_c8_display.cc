@@ -9,17 +9,21 @@ class c8_display : public ::testing::Test {
 protected:
     C8_Display_ptr disp;
 
-    c8_display()
+    c8_display() {}
+    ~c8_display() {}
+
+    virtual void SetUp()
     {
         disp = C8_Display_init();
         EXPECT_NE(disp, nullptr);
-
     }
-    virtual ~c8_display()
+
+    virtual void TearDown()
     {
         C8_Display_free(&disp);
         EXPECT_EQ(disp, nullptr);
     }
+
 };
 
 TEST_F(c8_display, test_init_free)
@@ -89,3 +93,14 @@ TEST_F(c8_display, toggle)
     EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(disp, 0, 64), "Assertion `.*' failed");
 }
 
+TEST_F(c8_display, is_clear)
+{
+    C8_Display_clear(disp);
+    EXPECT_EQ(C8_Display_is_clear(disp), true);
+
+    C8_Display_pixel_toggle(disp, 1, 2);
+    EXPECT_EQ(C8_Display_is_clear(disp), false);
+
+    C8_Display_pixel_toggle(disp, 1, 2);
+    EXPECT_EQ(C8_Display_is_clear(disp), true);
+}

@@ -25,9 +25,10 @@ static const uint8_t C8_DIGITS[] = {
 };
 
 // 3.5795 MHz?
-C8_ptr C8_init(C8_Random_ptr rnd)
+C8_ptr C8_init(C8_Random_ptr rnd, C8_Display_ptr disp)
 {
     assert(rnd);
+    assert(disp);
 
     void *malloc_call = NULL;
     C8_ptr c8 = NULL;
@@ -41,6 +42,7 @@ C8_ptr C8_init(C8_Random_ptr rnd)
     c8->Ram = (uint8_t *)malloc_call;
 
     c8->Random = rnd;
+    c8->Display = disp;
 
     return c8;
 }
@@ -65,6 +67,8 @@ void C8_reset(C8_ptr c8)
     memset(c8->Vx, 0x00, NELEMS(c8->Vx));
     memset(c8->Key, 0x00, NELEMS(c8->Key));
     memcpy(c8->Ram, C8_DIGITS, NELEMS(C8_DIGITS));
+
+    C8_Display_clear(c8->Display);
 }
 
 void C8_load_program (C8_ptr c8, const uint8_t *data, size_t n)

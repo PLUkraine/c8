@@ -28,38 +28,47 @@ static const uint32_t TEST_SEED = 42;
 class c8_tests : public ::testing::Test {
 protected:
     C8_Random_ptr rnd;
+    C8_Display_ptr disp;
+    C8_ptr c8;
 
-    c8_tests()
-    {
+    c8_tests() {}
+    virtual ~c8_tests() {}
+
+    virtual void SetUp()
+    {  
         rnd = C8_Random_new(TEST_SEED);
+        disp = C8_Display_init();
+
+        c8 = C8_init(rnd, disp);
+        EXPECT_NE(c8, nullptr);
+        EXPECT_NE(c8->Ram, nullptr);
     }
-    virtual ~c8_tests()
+    virtual void TearDown()
     {
+        C8_free(&c8);
         C8_Random_free(&rnd);
+        C8_Display_free(&disp);
+        EXPECT_EQ(c8, nullptr);
     }
 };
 
 
 TEST_F(c8_tests, init_free)
 {
-    auto c8 = C8_init(rnd);
-    EXPECT_NE(c8, nullptr);
-    EXPECT_NE(c8->Ram, nullptr);
-    C8_free(&c8);
-    EXPECT_EQ(c8, nullptr);
+    C8_ptr empty = NULL;
 
-    EXPECT_DEBUG_DEATH(C8_init(NULL), "Assertion `rnd' failed");
+    EXPECT_DEBUG_DEATH(C8_init(NULL, disp), "Assertion `rnd' failed");
+    EXPECT_DEBUG_DEATH(C8_init(rnd, NULL), "Assertion `disp' failed");
     EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
-    EXPECT_DEBUG_DEATH(C8_free(&c8),  "Assertion `c8 && \\*c8' failed");
+    EXPECT_DEBUG_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
 }
 
 TEST_F(c8_tests, reset)
 {
-    auto c8 = C8_init(rnd);
-
     EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 
     C8_reset(c8);
+    EXPECT_EQ(C8_Display_is_clear(c8->Display), true);
     EXPECT_EQ(c8->PC,                 0x200);
     EXPECT_EQ(c8->Ram[0],             0xF0);
     EXPECT_EQ(c8->Ram[16*5-1],        0x80);
@@ -69,14 +78,10 @@ TEST_F(c8_tests, reset)
     {
         EXPECT_EQ(c8->Key[i], 0x00);
     }
-
-    C8_free(&c8);
 }
 
 TEST_F(c8_tests, load_program)
 {
-    auto c8 = C8_init(rnd);
-
     C8_reset(c8);
     char data[] = "pidora lol";
 
@@ -89,14 +94,10 @@ TEST_F(c8_tests, load_program)
     {
         EXPECT_EQ(c8->Ram[0x200+i], data[i]);
     }
-
-    C8_free(&c8);
 }
 
 TEST_F(c8_tests, set_key)
 {
-    auto c8 = C8_init(rnd);
-
     C8_reset(c8);
 
     EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, false), "Assertion `c8' failed");
@@ -111,13 +112,10 @@ TEST_F(c8_tests, set_key)
     C8_set_key(c8, 3, false);
     EXPECT_EQ(c8->Key[3], 0);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-
-    C8_free(&c8);
 }
 
 TEST_F(c8_tests, set_key_wait)
 {
-    auto c8 = C8_init(rnd);
     C8_reset(c8);
     
     c8->Vx[0xA] = 0x00;
@@ -143,14 +141,10 @@ TEST_F(c8_tests, set_key_wait)
     EXPECT_EQ(c8->Vx[0xA], 0x3);
     EXPECT_EQ(c8->Key[3], false);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
-
-    C8_free(&c8);
 }
 
 TEST_F(c8_tests, cycle)
 {
-    auto c8 = C8_init(rnd);
-
     C8_reset(c8);
 
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
@@ -177,6 +171,4 @@ TEST_F(c8_tests, cycle)
     C8_set_key(c8, NELEMS(c8->Vx)-1, true);
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x202);
-
-    C8_free(&c8);
 }

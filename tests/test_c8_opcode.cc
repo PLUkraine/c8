@@ -679,7 +679,7 @@ TEST_F(c8_opcode, ADD_I_Vx_overflow)
     c8->Vx[0x8] = 0x25;
     c8->I = 0x0FFA;
 
-    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
 
 TEST_F(c8_opcode, LD_F_Vx_multidigit)
@@ -749,7 +749,7 @@ TEST_F(c8_opcode, LD_B_Vx_I_overflow)
     c8->I = 0x0FFE;
     c8->Vx[0xC] = 0x9;
 
-    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
 
 TEST_F(c8_opcode, LD_Ram_Vx_normal)
@@ -776,7 +776,7 @@ TEST_F(c8_opcode, LD_Ram_Vx_overflow)
 
     c8->I = C8_LAST_ADDR - 0xA;
 
-    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
 
 TEST_F(c8_opcode, LD_Vx_Ram_normal)
@@ -803,7 +803,7 @@ TEST_F(c8_opcode, LD_Vx_Ram_overflow)
 
     c8->I = C8_LAST_ADDR - 0xA;
 
-    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
 
 TEST_F(c8_opcode, bad_opcode)
@@ -811,5 +811,5 @@ TEST_F(c8_opcode, bad_opcode)
     uint8_t opcode[] = { 0xFF, 0xFF, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    EXPECT_DEATH(C8_cycle(c8), "Assertion `!\"Bad Opcode\"' failed");
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion `!\"Bad Opcode\"' failed");
 }

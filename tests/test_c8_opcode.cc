@@ -805,3 +805,11 @@ TEST_F(c8_opcode, LD_Vx_Ram_overflow)
 
     EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
+
+TEST_F(c8_opcode, bad_opcode)
+{
+    uint8_t opcode[] = { 0xFF, 0xFF, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    EXPECT_DEATH(C8_cycle(c8), "Assertion `!\"Bad Opcode\"' failed");
+}

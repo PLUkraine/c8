@@ -283,6 +283,6 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     }
     else {
         // Invalid opcode - crash the app
-        assert(0);
+        assert(!"Bad Opcode");
     }
 }

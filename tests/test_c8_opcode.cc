@@ -778,3 +778,30 @@ TEST_F(c8_opcode, LD_Ram_Vx_overflow)
 
     EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
+
+TEST_F(c8_opcode, LD_Vx_Ram_normal)
+{
+    uint8_t opcode[] = { 0xFB, 0x65, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    uint8_t start_val = 0x60;
+    c8->I = 0x0515;
+    for (size_t i=0; i<NELEMS(c8->Vx); ++i)
+    {
+        c8->Ram[c8->I + i] = start_val + i;
+    }
+
+    C8_cycle(c8);
+    compare_ram_to_regs(0xB);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+}
+
+TEST_F(c8_opcode, LD_Vx_Ram_overflow)
+{
+    uint8_t opcode[] = { 0xFB, 0x65, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->I = C8_LAST_ADDR - 0xA;
+
+    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
+}

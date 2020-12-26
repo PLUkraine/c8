@@ -5,9 +5,6 @@
 #include "c8.h"
 #include "c8_private.h"
 
-static const uint16_t C8_START_ADDR = 0x200;
-static const uint16_t C8_LAST_ADDR  = 0xFFF;
-
 static const uint8_t C8_DIGITS[] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0,
     0x20, 0x60, 0x20, 0x20, 0x70,

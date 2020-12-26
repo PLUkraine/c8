@@ -3,7 +3,9 @@
 #include <assert.h>
 #include "cummon.h"
 
-static const uint16_t DIGIT_SIZE = 5;
+const uint16_t C8_START_ADDR = 0x0200;
+const uint16_t C8_LAST_ADDR  = 0x0FFF;
+const uint16_t DIGIT_SIZE    = 5;
 
 
 uint8_t C8_is_waiting_for_key(C8_ptr c8)
@@ -235,12 +237,27 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // ADD I, Vx -> No Overflow Flag!
         c8->I += *Vx;
+        assert(c8->I <= C8_LAST_ADDR);
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x29)
     {
         // LD F, Vx
         c8->I += DIGIT_SIZE * BIT_LO_4(*Vx);
+    }
+    else if (BIT_HI_4(opcode) == 0xF
+          && BIT_LO_8(opcode) == 0x33)
+    {
+        // LD B, Vx
+        assert(c8->I + 2 <= C8_LAST_ADDR);
+
+        int i;
+        int vx = *Vx;
+        for (i=0; i<3; ++i) {
+            int loc = (c8->I + 2 - i);
+            c8->Ram[loc] = vx % 10;
+            vx /= 10;
+        }
     }
     else {
         // Invalid opcode - crash the app

@@ -3,11 +3,12 @@ extern "C"
 {
     #include "cummon.h"
     #include "c8.h"
+    #include "c8_private.h"
 }
 
 // determinted by a objectively random dice roll on my table
 const uint32_t TEST_SEED = 4;
-const uint16_t START_ADDRESS = 0x200; 
+
 
 class c8_opcode : public ::testing::Test {
 protected:
@@ -95,7 +96,7 @@ TEST_F(c8_opcode, CALL_normal)
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0xABC);
     EXPECT_EQ(c8->SP, 1);
-    EXPECT_EQ(c8->Stack[0], START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->Stack[0], C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, CALL_overflow)
@@ -109,7 +110,7 @@ TEST_F(c8_opcode, CALL_overflow)
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0xABC);
     EXPECT_EQ(c8->SP, 0);
-    EXPECT_EQ(c8->Stack[15], START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->Stack[15], C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SE_skip)
@@ -120,7 +121,7 @@ TEST_F(c8_opcode, SE_skip)
     c8->Vx[5] = 0xBC;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, SE_no_skip)
@@ -131,7 +132,7 @@ TEST_F(c8_opcode, SE_no_skip)
     c8->Vx[5] = 0xBC;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SNE_no_skip)
@@ -142,7 +143,7 @@ TEST_F(c8_opcode, SNE_no_skip)
     c8->Vx[5] = 0xBC;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SNE_skip)
@@ -153,7 +154,7 @@ TEST_F(c8_opcode, SNE_skip)
     c8->Vx[5] = 0xBC;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, SEV_skip)
@@ -166,10 +167,10 @@ TEST_F(c8_opcode, SEV_skip)
     c8->Vx[0xC] = 0xBC;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x08);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x08);
 }
 
 TEST_F(c8_opcode, SEV_no_skip)
@@ -182,10 +183,10 @@ TEST_F(c8_opcode, SEV_no_skip)
     c8->Vx[0xC] = 0xAA;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, LD)
@@ -196,7 +197,7 @@ TEST_F(c8_opcode, LD)
     c8->Vx[0xC] = 0x00;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0xBC);
 }
 
@@ -209,7 +210,7 @@ TEST_F(c8_opcode, ADD_Vx)
     c8->Vx[0xF] = 0x00;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], (0xBC + 0x72) % 0x100);
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -223,7 +224,7 @@ TEST_F(c8_opcode, LD_V)
     c8->Vx[0x4] = 0xF1;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], c8->Vx[0x4]);
 }
 
@@ -236,7 +237,7 @@ TEST_F(c8_opcode, OR_V)
     c8->Vx[0x4] = 0xF1;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x72 | 0xF1);
 }
 
@@ -249,7 +250,7 @@ TEST_F(c8_opcode, AND_V)
     c8->Vx[0x4] = 0xF1;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x72 & 0xF1);
 }
 
@@ -262,7 +263,7 @@ TEST_F(c8_opcode, XOR_V)
     c8->Vx[0x4] = 0xF1;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x72 ^ 0xF1);
 }
 
@@ -275,7 +276,7 @@ TEST_F(c8_opcode, ADD_V_no_carry)
     c8->Vx[0x4] = 0xA7;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x33 + 0xA7);
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -289,7 +290,7 @@ TEST_F(c8_opcode, ADD_V_carry)
     c8->Vx[0x4] = 0xA7;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], (0x76 + 0xA7) % 0x100);
     EXPECT_EQ(c8->Vx[0xF], 0x01);
 }
@@ -303,7 +304,7 @@ TEST_F(c8_opcode, SUB_V_borrow)
     c8->Vx[0x4] = 0xA7;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], (0x100 + 0x33 - 0xA7));
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -317,7 +318,7 @@ TEST_F(c8_opcode, SUB_V_no_borrow)
     c8->Vx[0x4] = 0x31;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x76 - 0x31);
     EXPECT_EQ(c8->Vx[0xF], 0x01);
 }
@@ -330,7 +331,7 @@ TEST_F(c8_opcode, SHR_left_0)
     c8->Vx[0xC] = 0x32;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x32 >> 1);
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -343,7 +344,7 @@ TEST_F(c8_opcode, SHR_left_1)
     c8->Vx[0xC] = 0x33;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x33 >> 1);
     EXPECT_EQ(c8->Vx[0xF], 0x01);
 }
@@ -357,7 +358,7 @@ TEST_F(c8_opcode, SUBN_borrow)
     c8->Vx[0x4] = 0x31;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], (0x100 + 0x31 - 0x75));
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -371,7 +372,7 @@ TEST_F(c8_opcode, SUBN_no_borrow)
     c8->Vx[0x4] = 0x75;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x75 - 0x31);
     EXPECT_EQ(c8->Vx[0xF], 0x01);
 }
@@ -384,7 +385,7 @@ TEST_F(c8_opcode, SHL_right_0)
     c8->Vx[0xC] = 0x31;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x31 << 1);
     EXPECT_EQ(c8->Vx[0xF], 0x00);
 }
@@ -397,7 +398,7 @@ TEST_F(c8_opcode, SHL_right_1)
     c8->Vx[0xC] = 0x81;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->Vx[0xC], 0x2);
     EXPECT_EQ(c8->Vx[0xF], 0x01);
 }
@@ -411,10 +412,10 @@ TEST_F(c8_opcode, SNE_V_skip)
     c8->Vx[0x4] = 0xFF;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x08);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x08);
 }
 
 TEST_F(c8_opcode, SNE_V_no_skip)
@@ -426,10 +427,10 @@ TEST_F(c8_opcode, SNE_V_no_skip)
     c8->Vx[0x4] = 0x81;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, LD_I)
@@ -440,7 +441,7 @@ TEST_F(c8_opcode, LD_I)
     c8->I = 0x0000;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
     EXPECT_EQ(c8->I, 0xFBC);
 }
 
@@ -485,7 +486,7 @@ TEST_F(c8_opcode, RND)
         EXPECT_EQ(val, c8->Vx[0xC]);
     }
 
-    EXPECT_EQ(c8->PC, START_ADDRESS + 4*2);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 4*2);
 
     C8_Random_free(&rnd);
 }
@@ -508,7 +509,7 @@ TEST_F(c8_opcode, SKP_Vx_skip)
     C8_set_key(c8, 0x3, 1);
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, SKP_Vx_no_skip)
@@ -520,7 +521,7 @@ TEST_F(c8_opcode, SKP_Vx_no_skip)
     C8_set_key(c8, 0x3, 0);
     
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SKP_Vx_too_big)
@@ -532,7 +533,7 @@ TEST_F(c8_opcode, SKP_Vx_too_big)
     C8_set_key(c8, 0xA, 1);
     
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SKNP_Vx_skip)
@@ -544,7 +545,7 @@ TEST_F(c8_opcode, SKNP_Vx_skip)
     C8_set_key(c8, 0x3, 0);
     
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x04);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
 }
 
 TEST_F(c8_opcode, SKNP_Vx_no_skip)
@@ -556,7 +557,7 @@ TEST_F(c8_opcode, SKNP_Vx_no_skip)
     C8_set_key(c8, 0x3, 1);
     
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SKNP_Vx_too_big)
@@ -568,7 +569,7 @@ TEST_F(c8_opcode, SKNP_Vx_too_big)
     C8_set_key(c8, 0xA, 1);
     
     C8_cycle(c8);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, LD_Vx_DT)
@@ -580,7 +581,7 @@ TEST_F(c8_opcode, LD_Vx_DT)
     
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0x08], c8->DT);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, LD_Vx_K)
@@ -595,23 +596,23 @@ TEST_F(c8_opcode, LD_Vx_K)
 
     // block execution until key is pressed
     C8_cycle(c8);
-    ASSERT_EQ(c8->PC, START_ADDRESS + 0x02);
+    ASSERT_EQ(c8->PC, C8_START_ADDR + 0x02);
     for (int i=0; i<100; ++i)
     {
         C8_cycle(c8);
-        ASSERT_EQ(c8->PC, START_ADDRESS + 0x02);
+        ASSERT_EQ(c8->PC, C8_START_ADDR + 0x02);
     }
 
     // key was not pressed, should block
     C8_set_key(c8, 0xB, 0);
     C8_cycle(c8);
-    ASSERT_EQ(c8->PC, START_ADDRESS + 0x02);
+    ASSERT_EQ(c8->PC, C8_START_ADDR + 0x02);
     ASSERT_EQ(c8->Vx[0x8], 0);
 
     // key was pressed
     C8_set_key(c8, 0xB, 1);
     C8_cycle(c8);
-    ASSERT_EQ(c8->PC, START_ADDRESS + 0x04);
+    ASSERT_EQ(c8->PC, C8_START_ADDR + 0x04);
     ASSERT_EQ(c8->Vx[0x8], 0xB);
 }
 
@@ -624,7 +625,7 @@ TEST_F(c8_opcode, LD_DT_Vx)
     
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0x08], c8->DT);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, LD_ST_Vx)
@@ -636,7 +637,7 @@ TEST_F(c8_opcode, LD_ST_Vx)
     
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0x08], c8->ST);
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, ADD_I_Vx)
@@ -647,11 +648,22 @@ TEST_F(c8_opcode, ADD_I_Vx)
     // CONSIDER what happens when I >= 0x1000?
     // CONSIDER what happens when I overflows?
     c8->Vx[0x8] = 0x25;
-    c8->I = 0x0FFA;
+    c8->I = 0x062A;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->I, (0x0FFA + 0x25));
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->I, (0x062A + 0x25));
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+}
+
+TEST_F(c8_opcode, ADD_I_Vx_overflow)
+{
+    uint8_t opcode[] = { 0xF8, 0x1E, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->Vx[0x8] = 0x25;
+    c8->I = 0x0FFA;
+
+    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
 }
 
 TEST_F(c8_opcode, LD_F_Vx_multidigit)
@@ -663,7 +675,7 @@ TEST_F(c8_opcode, LD_F_Vx_multidigit)
 
     C8_cycle(c8);
     EXPECT_EQ(c8->I, (5 * 0xA));
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, LD_F_Vx_single_digit)
@@ -675,5 +687,51 @@ TEST_F(c8_opcode, LD_F_Vx_single_digit)
 
     C8_cycle(c8);
     EXPECT_EQ(c8->I, (5 * 0x9));
-    EXPECT_EQ(c8->PC, START_ADDRESS + 0x02);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+}
+
+TEST_F(c8_opcode, LD_B_Vx_normal)
+{
+    uint8_t opcode[] = { 0xFC, 0x33, 0xFC, 0x33, 0xFC, 0x33, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->I = 0x509;
+    c8->Vx[0xC] = 209;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Ram[c8->I + 0], 2);
+    EXPECT_EQ(c8->Ram[c8->I + 1], 0);
+    EXPECT_EQ(c8->Ram[c8->I + 2], 9);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+
+
+    c8->I = 0x505;
+    c8->Vx[0xC] = 0;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Ram[c8->I + 0], 0);
+    EXPECT_EQ(c8->Ram[c8->I + 1], 0);
+    EXPECT_EQ(c8->Ram[c8->I + 2], 0);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
+
+
+    c8->I = 0x501;
+    c8->Vx[0xC] = 97;
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Ram[c8->I + 0], 0);
+    EXPECT_EQ(c8->Ram[c8->I + 1], 9);
+    EXPECT_EQ(c8->Ram[c8->I + 2], 7);
+    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x06);
+}
+
+TEST_F(c8_opcode, LD_B_Vx_I_overflow)
+{
+    uint8_t opcode[] = { 0xFC, 0x33, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->I = 0x0FFE;
+    c8->Vx[0xC] = 0x9;
+
+    EXPECT_DEATH(C8_cycle(c8), "Assertion .* failed");
 }

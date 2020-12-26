@@ -51,13 +51,15 @@ protected:
     }
 };
 
-TEST_F(c8_opcode, DISABLED_CLS)
+TEST_F(c8_opcode, CLS)
 {
     uint8_t opcode[] = { 0x00, 0xE0, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
+    C8_Display_pixel_toggle(c8->Display, 6, 0);
+    EXPECT_FALSE(C8_Display_is_clear(c8->Display));
     C8_cycle(c8);
-    FAIL();
+    EXPECT_TRUE(C8_Display_is_clear(c8->Display));
 }
 
 TEST_F(c8_opcode, SYS)

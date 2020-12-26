@@ -96,11 +96,11 @@ TEST_F(c8_display, toggle)
 TEST_F(c8_display, is_clear)
 {
     C8_Display_clear(disp);
-    EXPECT_EQ(C8_Display_is_clear(disp), true);
+    EXPECT_TRUE(C8_Display_is_clear(disp));
 
     C8_Display_pixel_toggle(disp, 1, 2);
-    EXPECT_EQ(C8_Display_is_clear(disp), false);
+    EXPECT_FALSE(C8_Display_is_clear(disp));
 
     C8_Display_pixel_toggle(disp, 1, 2);
-    EXPECT_EQ(C8_Display_is_clear(disp), true);
+    EXPECT_TRUE(C8_Display_is_clear(disp));
 }

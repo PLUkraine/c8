@@ -43,8 +43,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     if (opcode == 0x00E0)
     {
         // CLS
-        // TODO implement display
-        assert(0);
+        C8_Display_clear(c8->Display);
     }
     else if (opcode == 0x00EE)
     {

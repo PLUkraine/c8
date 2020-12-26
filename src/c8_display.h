@@ -7,8 +7,8 @@
 struct C8_Display;
 typedef struct C8_Display *C8_Display_ptr;
 
-extern const uint16_t C8_DISPLAY_WIDTH;
-extern const uint16_t C8_DISPLAY_HEIGHT;
+extern const int C8_DISPLAY_WIDTH;
+extern const int C8_DISPLAY_HEIGHT;
 
 typedef enum {
     C8_DISPLAY_OFF = 0,

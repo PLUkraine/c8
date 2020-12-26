@@ -5,9 +5,9 @@
 #include <assert.h>
 #include "cummon.h"
 
-const uint16_t C8_DISPLAY_WIDTH  = 64;
-const uint16_t C8_DISPLAY_HEIGHT = 32;
-const uint16_t C8_DISPLAY_SIZE = C8_DISPLAY_WIDTH * C8_DISPLAY_HEIGHT;
+const int C8_DISPLAY_WIDTH  = 64;
+const int C8_DISPLAY_HEIGHT = 32;
+static const int C8_DISPLAY_SIZE = C8_DISPLAY_WIDTH * C8_DISPLAY_HEIGHT;
 
 struct C8_Display
 {
@@ -44,16 +44,16 @@ void C8_Display_free(C8_Display_ptr *disp)
 
 C8_Display_Color C8_Display_pixel(C8_Display_ptr disp, int row, int col)
 {
-    assert(row < C8_DISPLAY_HEIGHT);
-    assert(col < C8_DISPLAY_WIDTH);
+    assert(0<=row && row<C8_DISPLAY_HEIGHT);
+    assert(0<=col && col<C8_DISPLAY_WIDTH);
 
     return disp->pixels[coord_1d(row, col, C8_DISPLAY_WIDTH)];
 }
 
 C8_Display_Color C8_Display_pixel_toggle(C8_Display_ptr disp, int row, int col)
 {
-    assert(row < C8_DISPLAY_HEIGHT);
-    assert(col < C8_DISPLAY_WIDTH);
+    assert(0<=row && row<C8_DISPLAY_HEIGHT);
+    assert(0<=col && col<C8_DISPLAY_WIDTH);
 
     uint8_t *pixel = disp->pixels + coord_1d(row, col, C8_DISPLAY_WIDTH);
     return *pixel = !(*pixel);

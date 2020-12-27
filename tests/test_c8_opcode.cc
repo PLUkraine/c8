@@ -512,13 +512,34 @@ TEST_F(c8_opcode, RND)
     C8_Random_free(&rnd);
 }
 
-TEST_F(c8_opcode, DISABLED_DRW)
+TEST_F(c8_opcode, DRW_simple)
 {
-    uint8_t opcode[] = { 0xDB, 0xA8, };
+    uint8_t opcode[] = { 0xD1, 0x25, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
+    C8_Display_pixel_toggle(c8->Display, 0x3, 0x1);
+
+    c8->I = C8_DIGIT_SIZE * 0x2; // Draw 2 (5 bytes)
+    c8->Vx[0x1] = 0x0; // col 0
+    c8->Vx[0x2] = 0x2; // row 2
+
     C8_cycle(c8);
-    FAIL();
+    EXPECT_EQ(c8->Vx[0xF], 0);
+}
+
+TEST_F(c8_opcode, DRW_collision)
+{
+    uint8_t opcode[] = { 0xD1, 0x25, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    C8_Display_pixel_toggle(c8->Display, 0x2, 0x2);
+
+    c8->I = C8_DIGIT_SIZE * 0x2; // Draw 2 (5 bytes)
+    c8->Vx[0x1] = 0x0; // col 0
+    c8->Vx[0x2] = 0x2; // row 2
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Vx[0xF], 1);
 }
 
 TEST_F(c8_opcode, SKP_Vx_skip)
@@ -695,7 +716,7 @@ TEST_F(c8_opcode, LD_F_Vx_multidigit)
     c8->Vx[0xC] = 0xFA;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->I, (5 * 0xA));
+    EXPECT_EQ(c8->I, (C8_DIGIT_SIZE * 0xA));
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 
@@ -707,7 +728,7 @@ TEST_F(c8_opcode, LD_F_Vx_single_digit)
     c8->Vx[0xC] = 0x9;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->I, (5 * 0x9));
+    EXPECT_EQ(c8->I, (C8_DIGIT_SIZE * 0x9));
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 

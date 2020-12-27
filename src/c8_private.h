@@ -5,8 +5,8 @@
 
 extern const uint16_t C8_START_ADDR;
 extern const uint16_t C8_LAST_ADDR;
-extern const uint16_t DIGIT_SIZE;
-extern const uint16_t C8_LAST_ADDR;
+extern const uint16_t C8_DIGIT_SIZE;
+extern const uint16_t C8_SPRITE_WIDTH;
 
 
 extern void    C8_exec_opcode       (C8_ptr c8, uint16_t opcode);

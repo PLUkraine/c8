@@ -13,7 +13,8 @@ int main(int argc, char** argv)
     Q_UNUSED(argc);
     Q_UNUSED(argv);
     
-    SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
+    SDL_Init(SDL_INIT_EVERYTHING);
+    log_info("init\n");
     SDL_Quit();
     return 0;
 }

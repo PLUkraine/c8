@@ -36,11 +36,18 @@ enable_testing()
 add_subdirectory(tests)
 
 # create targets
-add_library(c8_lib STATIC src/c8.c src/c8_private.c src/c8_random.c src/c8_display.c)
+add_library(c8_lib STATIC
+  src/c8.c
+  src/c8_private.c
+  src/c8_random.c
+  src/c8_display.c)
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 
-add_executable(c8 src/main.c src/logging.c)
+add_executable(c8
+  src/main.c
+  src/logging.c
+  src/c8_app.c)
 target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)
 target_compile_options(c8 PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 

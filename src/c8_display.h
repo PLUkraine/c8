@@ -15,7 +15,7 @@ typedef enum {
     C8_DISPLAY_ON  = 1,
 } C8_Display_Color;
 
-extern C8_Display_ptr      C8_Display_init();
+extern C8_Display_ptr      C8_Display_init(void);
 extern void                C8_Display_free(C8_Display_ptr *disp);
 
 extern C8_Display_Color    C8_Display_pixel(C8_Display_ptr disp, int row, int col);

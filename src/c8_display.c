@@ -19,7 +19,7 @@ int coord_1d(int row, int col, int width)
     return row * width + col;
 }
 
-C8_Display_ptr C8_Display_init()
+C8_Display_ptr C8_Display_init(void)
 {
     void   *malloc_call = NULL;
     C8_Display_ptr disp = NULL;

@@ -196,7 +196,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
             for (j=0; j<C8_SPRITE_WIDTH; ++j)
             {
                 int row = (*Vy + i) % C8_DISPLAY_HEIGHT;
-                int col = (*Vx + j) % C8_DISPLAY_HEIGHT;
+                int col = (*Vx + j) % C8_DISPLAY_WIDTH;
                 uint8_t pixel = c8->Ram[ramPos] & (1 << (C8_SPRITE_WIDTH - 1 - j));
                 if (pixel)
                 {

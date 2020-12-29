@@ -514,32 +514,105 @@ TEST_F(c8_opcode, RND)
 
 TEST_F(c8_opcode, DRW_simple)
 {
-    uint8_t opcode[] = { 0xD1, 0x25, };
+    uint8_t opcode[] = { 0xD1, 0x22, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    C8_Display_pixel_toggle(c8->Display, 0x3, 0x1);
+    C8_Display_pixel_toggle(c8->Display, 0x2, 0x1);
 
-    c8->I = C8_DIGIT_SIZE * 0x2; // Draw 2 (5 bytes)
+    c8->I = 0x500;
+    c8->Ram[0x500] = 0b10001001;
+    c8->Ram[0x501] = 0b11100010;
     c8->Vx[0x1] = 0x0; // col 0
     c8->Vx[0x2] = 0x2; // row 2
 
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0xF], 0);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 0), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 2), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 3), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 4), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 5), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 6), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 7), 1);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 0), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 2), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 3), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 4), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 5), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 6), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 7), 0);
 }
 
 TEST_F(c8_opcode, DRW_collision)
 {
-    uint8_t opcode[] = { 0xD1, 0x25, };
+    uint8_t opcode[] = { 0xD1, 0x22, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    C8_Display_pixel_toggle(c8->Display, 0x2, 0x2);
+    C8_Display_pixel_toggle(c8->Display, 0x2, 0x4);
 
-    c8->I = C8_DIGIT_SIZE * 0x2; // Draw 2 (5 bytes)
+    c8->I = 0x500;
+    c8->Ram[0x500] = 0b10001001;
+    c8->Ram[0x501] = 0b11100010;
     c8->Vx[0x1] = 0x0; // col 0
     c8->Vx[0x2] = 0x2; // row 2
 
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0xF], 1);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 0), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 1), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 2), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 3), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 4), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 5), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 6), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 2, 7), 1);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 0), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 2), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 3), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 4), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 5), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 6), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 3, 7), 0);
+}
+
+TEST_F(c8_opcode, DRW_overflow)
+{
+    uint8_t opcode[] = { 0xD1, 0x22, };
+    C8_load_program(c8, opcode, NELEMS(opcode));
+
+    c8->I = 0x500;
+    c8->Ram[0x500] = 0b10001001;
+    c8->Ram[0x501] = 0b11100010;
+    c8->Vx[0x1] = C8_DISPLAY_WIDTH * 2 - 1; // col 63
+    c8->Vx[0x2] = C8_DISPLAY_HEIGHT - 1; // row 63
+
+    C8_cycle(c8);
+    EXPECT_EQ(c8->Vx[0xF], 0);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, C8_DISPLAY_WIDTH - 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 0), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 1), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 2), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 3), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 4), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 5), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, C8_DISPLAY_HEIGHT-1, 6), 1);
+
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, C8_DISPLAY_WIDTH - 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 0), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 1), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 2), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 3), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 4), 0);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 5), 1);
+    EXPECT_EQ(C8_Display_pixel(c8->Display, 0, 6), 0);
 }
 
 TEST_F(c8_opcode, SKP_Vx_skip)

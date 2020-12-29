@@ -591,7 +591,7 @@ TEST_F(c8_opcode, DRW_overflow)
     c8->Ram[0x500] = 0b10001001;
     c8->Ram[0x501] = 0b11100010;
     c8->Vx[0x1] = C8_DISPLAY_WIDTH * 2 - 1; // col 63
-    c8->Vx[0x2] = C8_DISPLAY_HEIGHT - 1; // row 63
+    c8->Vx[0x2] = C8_DISPLAY_HEIGHT - 1; // row 31
 
     C8_cycle(c8);
     EXPECT_EQ(c8->Vx[0xF], 0);

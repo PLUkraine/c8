@@ -28,9 +28,11 @@ protected:
 
 TEST_F(c8_display, test_init_free)
 {
+#ifndef NDEBUG
     C8_Display_ptr empty = NULL;
     EXPECT_DEBUG_DEATH(C8_Display_free(NULL), "Assertion `disp && \\*disp' failed");
     EXPECT_DEBUG_DEATH(C8_Display_free(&empty),  "Assertion `disp && \\*disp' failed");
+#endif
 }
 
 TEST_F(c8_display, coord_1d)
@@ -41,6 +43,10 @@ TEST_F(c8_display, coord_1d)
 
 TEST_F(c8_display, clear)
 {
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_Display_pixel(NULL, -1, 0), "Assertion `.*' failed");
+#endif
+    
     C8_Display_clear(disp);
     for (int i=0; i<C8_DISPLAY_HEIGHT; ++i)
     {
@@ -53,11 +59,15 @@ TEST_F(c8_display, clear)
 
 TEST_F(c8_display, get_pixel)
 {
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_Display_pixel(NULL, -1, 0), "Assertion `.*' failed");
+
     EXPECT_DEBUG_DEATH(C8_Display_pixel(disp, -1, 0), "Assertion `.*' failed");
     EXPECT_DEBUG_DEATH(C8_Display_pixel(disp, 0, -1), "Assertion `.*' failed");
 
     EXPECT_DEBUG_DEATH(C8_Display_pixel(disp, 32, 0), "Assertion `.*' failed");
     EXPECT_DEBUG_DEATH(C8_Display_pixel(disp, 0, 64), "Assertion `.*' failed");
+#endif
 }
 
 TEST_F(c8_display, toggle)
@@ -85,16 +95,23 @@ TEST_F(c8_display, toggle)
     EXPECT_EQ(C8_Display_pixel_toggle(disp, 0, 0), C8_DISPLAY_OFF);
     EXPECT_EQ(C8_Display_pixel(disp, 0, 0), C8_DISPLAY_OFF);
 
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(NULL, -1, 0), "Assertion `.*' failed");
 
     EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(disp, -1, 0), "Assertion `.*' failed");
     EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(disp, 0, -1), "Assertion `.*' failed");
 
     EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(disp, 32, 0), "Assertion `.*' failed");
     EXPECT_DEBUG_DEATH(C8_Display_pixel_toggle(disp, 0, 64), "Assertion `.*' failed");
+#endif
 }
 
 TEST_F(c8_display, is_clear)
 {
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_Display_is_clear(NULL), "Assertion .* failed");
+#endif
+
     C8_Display_clear(disp);
     EXPECT_TRUE(C8_Display_is_clear(disp));
 

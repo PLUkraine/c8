@@ -55,17 +55,22 @@ protected:
 
 TEST_F(c8_tests, init_free)
 {
+#ifndef NDEBUG
     C8_ptr empty = NULL;
 
     EXPECT_DEBUG_DEATH(C8_init(NULL, disp), "Assertion `rnd' failed");
     EXPECT_DEBUG_DEATH(C8_init(rnd, NULL), "Assertion `disp' failed");
     EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
     EXPECT_DEBUG_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
+#endif
 }
 
 TEST_F(c8_tests, reset)
 {
+    
+#ifndef NDEBUG
     EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
+#endif
 
     C8_reset(c8);
     EXPECT_EQ(C8_Display_is_clear(c8->Display), true);
@@ -85,9 +90,11 @@ TEST_F(c8_tests, load_program)
     C8_reset(c8);
     char data[] = "pidora lol";
 
+#ifndef NDEBUG
     EXPECT_DEBUG_DEATH(C8_load_program(NULL, (uint8_t *)data, strlen(data)), "Assertion `c8' failed.");
     EXPECT_DEBUG_DEATH(C8_load_program(c8, NULL, strlen(data)), "Assertion `data' failed");
     EXPECT_DEBUG_DEATH(C8_load_program(c8, (uint8_t *)data, 0xFFF - 0x200 + 2), "Assertion .* failed");
+#endif
 
     C8_load_program(c8, (uint8_t *)data, strlen(data));
     for (size_t i=0; i<NELEMS(data); ++i)
@@ -100,8 +107,10 @@ TEST_F(c8_tests, set_key)
 {
     C8_reset(c8);
 
+#ifndef NDEBUG
     EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, false), "Assertion `c8' failed");
     EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, false), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
+#endif
 
     C8_set_key(c8, 3, true);
     EXPECT_EQ(c8->Key[3], 1);
@@ -147,9 +156,11 @@ TEST_F(c8_tests, cycle)
 {
     C8_reset(c8);
 
+#ifndef NDEBUG
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
     c8->WriteKeyToRegistry = NELEMS(c8->Vx) + 1;
     EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
+#endif
 
     // won't execute until key was pressed
     c8->WriteKeyToRegistry = NELEMS(c8->Vx);

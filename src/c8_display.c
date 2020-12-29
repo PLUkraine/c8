@@ -61,11 +61,15 @@ C8_Display_Color C8_Display_pixel_toggle(C8_Display_ptr disp, int row, int col)
 
 void C8_Display_clear(C8_Display_ptr disp)
 {
+    assert(disp);
+
     memset(disp->pixels, C8_DISPLAY_OFF, C8_DISPLAY_SIZE);
 }
 
 bool C8_Display_is_clear(C8_Display_ptr disp)
 {
+    assert(disp);
+
     int i;
     C8_Display_Color result = C8_DISPLAY_OFF;
     for (i=0; i<C8_DISPLAY_SIZE; ++i)

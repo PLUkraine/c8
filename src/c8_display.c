@@ -5,8 +5,6 @@
 #include <assert.h>
 #include "cummon.h"
 
-const int C8_DISPLAY_WIDTH  = 64;
-const int C8_DISPLAY_HEIGHT = 32;
 static const int C8_DISPLAY_SIZE = C8_DISPLAY_WIDTH * C8_DISPLAY_HEIGHT;
 
 struct C8_Display

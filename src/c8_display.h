@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define C8_DISPLAY_WIDTH 64
+#define C8_DISPLAY_HEIGHT 32
+
 struct C8_Display;
 typedef struct C8_Display *C8_Display_ptr;
-
-extern const int C8_DISPLAY_WIDTH;
-extern const int C8_DISPLAY_HEIGHT;
 
 typedef enum {
     C8_DISPLAY_OFF = 0,

@@ -1,5 +1,7 @@
 #include "logging.h"
 
+#include <SDL2/SDL_log.h>
+
 void log_info(char *format, ...)
 {
     va_list args;

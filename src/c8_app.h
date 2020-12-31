@@ -8,10 +8,10 @@ struct C8_App;
 
 typedef struct C8_App *C8_App_ptr;
 
-C8_App_ptr  C8_App_init(void); // TODO settings
-void        C8_App_free(C8_App_ptr *app);
+extern C8_App_ptr  C8_App_init(void); // TODO settings
+extern void        C8_App_free(C8_App_ptr *app);
 
-void        C8_App_main_loop(C8_App_ptr *app);
+extern void        C8_App_main_loop(C8_App_ptr app);
 
 
 #endif // C8_APP_H_INCLUDED

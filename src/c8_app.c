@@ -14,6 +14,10 @@ struct C8_App
 {
     SDL_Window *window;
     SDL_Renderer *renderer;
+
+    C8_Random_ptr rng;
+    C8_Display_ptr disp;
+    C8_ptr c8;
 };
 
 void print_SDL_error_and_exit()
@@ -22,6 +26,23 @@ void print_SDL_error_and_exit()
     abort();
 }
 
+void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
+{
+    for (int i=0; i<C8_DISPLAY_HEIGHT; ++i)
+    {
+        for (int j=0; j<C8_DISPLAY_WIDTH; ++j)
+        {
+            if (C8_Display_pixel(disp, i, j) == C8_DISPLAY_ON)
+            {
+                SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+            }
+        }
+    }
+}
 
 
 C8_App_ptr C8_App_init(void)
@@ -32,6 +53,10 @@ C8_App_ptr C8_App_init(void)
     malloc_call = malloc(sizeof(*app));
     assert(malloc_call);
     app = (C8_App_ptr) malloc_call;
+
+    app->rng = C8_Random_new(42); // todo: init from time
+    app->disp = C8_Display_init();
+    app->c8 = C8_init(app->rng, app->disp);
 
     app->window = SDL_CreateWindow("C8",
         SDL_WINDOWPOS_UNDEFINED,
@@ -49,13 +74,20 @@ C8_App_ptr C8_App_init(void)
     return app;
 }
 
-void C8_App_free(C8_App_ptr *app)
+void C8_App_free(C8_App_ptr *p_app)
 {
-    assert(app && *app);
-    SDL_DestroyRenderer((*app)->renderer);
-    SDL_DestroyWindow((*app)->window);
-    free(*app);
-    *app = NULL;
+    assert(p_app && *p_app);
+    C8_App_ptr app = *p_app;
+    
+    C8_free(&(app->c8));
+    C8_Random_free(&(app->rng));
+    C8_Display_free(&(app->disp));
+
+    SDL_DestroyRenderer(app->renderer);
+    SDL_DestroyWindow(app->window);
+
+    free(*p_app);
+    *p_app = NULL;
 }
 
 void C8_App_main_loop(C8_App_ptr app)
@@ -72,7 +104,6 @@ void C8_App_main_loop(C8_App_ptr app)
                 quit = true;
             }
         }
-
         
         SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, 255);
         SDL_RenderClear(app->renderer);

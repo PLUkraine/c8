@@ -28,10 +28,20 @@ void print_SDL_error_and_exit()
 
 void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
 {
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderClear(renderer);
+
+    SDL_Rect pixel;
+    pixel.w = APP_WIDTH / C8_DISPLAY_WIDTH;
+    pixel.h = APP_HEIGHT / C8_DISPLAY_HEIGHT;
+
     for (int i=0; i<C8_DISPLAY_HEIGHT; ++i)
     {
         for (int j=0; j<C8_DISPLAY_WIDTH; ++j)
         {
+            pixel.y = i * pixel.h;
+            pixel.x = j * pixel.w;
+
             if (C8_Display_pixel(disp, i, j) == C8_DISPLAY_ON)
             {
                 SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -40,6 +50,8 @@ void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
             {
                 SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
             }
+
+            SDL_RenderFillRect(renderer, &pixel);
         }
     }
 }
@@ -104,9 +116,10 @@ void C8_App_main_loop(C8_App_ptr app)
                 quit = true;
             }
         }
-        
-        SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, 255);
-        SDL_RenderClear(app->renderer);
+
+        // C8_Display_pixel_toggle(app->disp, 1, 1);
+
+        render_c8_disp(app->renderer, app->disp);
 
         SDL_RenderPresent(app->renderer);
         SDL_Delay(100);

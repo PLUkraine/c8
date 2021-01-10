@@ -107,6 +107,39 @@ void process_events(bool *quit)
 }
 
 
+void process_keyboard(C8_ptr c8)
+{
+    const Uint8* keystates = SDL_GetKeyboardState(NULL);
+    const int keys[] = {
+        SDL_SCANCODE_X, // 0x00
+        SDL_SCANCODE_1, // 0x01
+        SDL_SCANCODE_2, // 0x02
+        SDL_SCANCODE_3, // 0x03
+
+        SDL_SCANCODE_Q, // 0x04
+        SDL_SCANCODE_W, // 0x05
+        SDL_SCANCODE_E, // 0x06
+        SDL_SCANCODE_A, // 0x07
+
+        SDL_SCANCODE_S, // 0x08
+        SDL_SCANCODE_D, // 0x09
+        SDL_SCANCODE_Z, // 0x0A
+        SDL_SCANCODE_C, // 0x0B
+
+        SDL_SCANCODE_4, // 0x0C
+        SDL_SCANCODE_R, // 0x0D
+        SDL_SCANCODE_F, // 0x0E
+        SDL_SCANCODE_V, // 0x0F
+    };
+
+    size_t i;
+    for (i=0; i<NELEMS(keys); ++i)
+    {
+        C8_set_key(c8, i, keystates[keys[i]]);
+    }
+}
+
+
 C8_App_ptr C8_App_init(const char *game_path)
 {
     void   *malloc_call = NULL;
@@ -171,6 +204,7 @@ void C8_App_main_loop(C8_App_ptr app)
         log_info("Delta time: %f\n", delta);
 
         process_events(&quit);
+        process_keyboard(app->c8);
 
         timer_accum  += delta;
         while (timer_accum  > TIMER_FREQ) {

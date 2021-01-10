@@ -11,6 +11,8 @@
 #define APP_WIDTH (C8_DISPLAY_WIDTH * 10)
 #define APP_HEIGHT (C8_DISPLAY_HEIGHT * 10)
 #define EXIT_BAD 1
+#define TIMER_FREQ (1.0f/60.0f)
+#define UPDATE_FREQ (1.0f/200.0f)
 
 
 struct C8_App
@@ -160,15 +162,28 @@ void C8_App_main_loop(C8_App_ptr app)
 {
     bool quit = false;
     Uint64 start_time = SDL_GetPerformanceCounter();
+    float timer_accum = 0.0;
+    float update_accum = 0.0;
     
     while (!quit)
     {
         float delta = compute_delta(&start_time);
         log_info("Delta time: %f\n", delta);
-        
-        process_events(&quit);
-        render_c8_disp(app->renderer, app->disp);
 
-        SDL_Delay(1000);
+        process_events(&quit);
+
+        timer_accum  += delta;
+        while (timer_accum  > TIMER_FREQ) {
+            timer_accum -= TIMER_FREQ;
+            C8_timers(app->c8);
+        }
+
+        update_accum += delta;
+        while (update_accum > UPDATE_FREQ) {
+            update_accum -= UPDATE_FREQ;
+            C8_cycle(app->c8);
+        }
+        
+        render_c8_disp(app->renderer, app->disp);
     }
 }

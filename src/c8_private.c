@@ -3,8 +3,7 @@
 #include <assert.h>
 #include "cummon.h"
 
-const uint16_t C8_START_ADDR    = 0x0200;
-const uint16_t C8_LAST_ADDR     = 0x0FFF;
+
 const uint16_t C8_DIGIT_SIZE    = 5;
 const uint16_t C8_SPRITE_WIDTH  = 8;
 

@@ -72,12 +72,16 @@ TEST_F(c8_tests, reset)
     EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 #endif
 
+    c8->Ram[0x500] = 0xFA;
+    c8->Ram[0x501] = 0xA0;
     C8_reset(c8);
     EXPECT_EQ(C8_Display_is_clear(c8->Display), true);
     EXPECT_EQ(c8->PC,                 0x200);
     EXPECT_EQ(c8->Ram[0],             0xF0);
     EXPECT_EQ(c8->Ram[16*5-1],        0x80);
     EXPECT_EQ(c8->Ram[16*5],          0x00);
+    EXPECT_EQ(c8->Ram[0x500],         0xFA);
+    EXPECT_EQ(c8->Ram[0x501],         0xA0);
     EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
     for (size_t i=0; i<NELEMS(c8->Key); ++i)
     {

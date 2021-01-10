@@ -2,12 +2,15 @@
 
 #include <SDL2/SDL.h>
 #include <assert.h>
+#include <errno.h>
 #include "cummon.h"
 #include "logging.h"
 #include "c8.h"
+#include "c8_read.h"
 
 #define APP_WIDTH (C8_DISPLAY_WIDTH * 10)
 #define APP_HEIGHT (C8_DISPLAY_HEIGHT * 10)
+#define EXIT_BAD 1
 
 
 struct C8_App
@@ -23,7 +26,7 @@ struct C8_App
 void print_SDL_error_and_exit()
 {
     log_error("SDL error:\n%s", SDL_GetError());
-    abort();
+    exit(EXIT_BAD);
 }
 
 void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
@@ -57,6 +60,24 @@ void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
 }
 
 
+void load_c8_program(C8_ptr c8, const char *filepath)
+{
+    const size_t N = C8_LAST_ADDR - C8_START_ADDR + 1;
+    uint8_t opcodes[N];
+    size_t read_bytes = 0;
+    if ((read_bytes = C8_read_program(filepath, opcodes, N)) == 0) {
+        log_error("Couldn't read game data. Make sure that file \"%s\" exists and it is less than %d bytes",
+            filepath,
+            N);
+        log_error("ERRNO: %s", strerror(errno));
+        exit(EXIT_BAD);
+    }
+
+    C8_reset(c8);
+    C8_load_program(c8, opcodes, read_bytes);
+}
+
+
 C8_App_ptr C8_App_init(const char *game_path)
 {
     void   *malloc_call = NULL;
@@ -66,10 +87,13 @@ C8_App_ptr C8_App_init(const char *game_path)
     assert(malloc_call);
     app = (C8_App_ptr) malloc_call;
 
+    // init, reset and load program
     app->rng = C8_Random_new(42); // todo: init from time
     app->disp = C8_Display_init();
     app->c8 = C8_init(app->rng, app->disp);
+    load_c8_program(app->c8, game_path);
 
+    // init SDL rendering
     app->window = SDL_CreateWindow("C8",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,

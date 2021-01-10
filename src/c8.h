@@ -8,6 +8,9 @@
 #include "c8_random.h"
 #include "c8_display.h"
 
+#define C8_START_ADDR ((uint16_t)0x0200)
+#define C8_LAST_ADDR  ((uint16_t)0x0FFF)
+
 // expose for testing
 struct C8_T {
     uint8_t        Vx[16];

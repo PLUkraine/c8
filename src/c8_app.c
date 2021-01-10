@@ -201,7 +201,7 @@ void C8_App_main_loop(C8_App_ptr app)
     while (!quit)
     {
         float delta = compute_delta(&start_time);
-        log_info("Delta time: %f\n", delta);
+        // log_info("Delta time: %f\n", delta);
 
         process_events(&quit);
         process_keyboard(app->c8);

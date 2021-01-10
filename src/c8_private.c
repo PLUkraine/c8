@@ -4,6 +4,15 @@
 #include "cummon.h"
 
 
+#ifdef C8_LOG_OPCODE
+#include "logging.h"
+#define LOG_OPCODE(str, code) log_info("OPCODE: %s, 0x%x", str, code)
+#else
+#define LOG_OPCODE(str, code) ((void)(code))
+#endif
+
+
+
 const uint16_t C8_DIGIT_SIZE    = 5;
 const uint16_t C8_SPRITE_WIDTH  = 8;
 
@@ -43,22 +52,27 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     if (opcode == 0x00E0)
     {
         // CLS
+        LOG_OPCODE("CLS", opcode);
         C8_Display_clear(c8->Display);
     }
     else if (opcode == 0x00EE)
     {
         // RET
-        c8->PC = c8->Stack[c8->SP--];
+        LOG_OPCODE("RET", opcode);
+        c8->SP--;
         if (c8->SP == 0xFF) c8->SP = NELEMS(c8->Stack) - 1;
+        c8->PC = c8->Stack[c8->SP];
     }
-    else if (BIT_HI_4(opcode) == 0x0 || BIT_HI_4(opcode) == 0x1)
+    else if (BIT_HI_4(opcode) == 0x1)
     {
         // SYS addr && JP addr
+        LOG_OPCODE("SYS or JP", opcode);
         c8->PC = BIT_LO_12(opcode);
     }
     else if (BIT_HI_4(opcode) == 0x2)
     {
         // CALL addr
+        LOG_OPCODE("CALL", opcode);
         c8->Stack[c8->SP++] = c8->PC;
         if (c8->SP >= NELEMS(c8->Stack)) c8->SP = 0;
         c8->PC = BIT_LO_12(opcode);
@@ -66,6 +80,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x3)
     {
         // SE VX, byte
+        LOG_OPCODE("SE VX, byte", opcode);
         if (*Vx == BIT_LO_8(opcode))
         {
             c8->PC += 2;
@@ -74,6 +89,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x4)
     {
         // SNE VX, byte
+        LOG_OPCODE("SNE VX, byte", opcode);
         if (*Vx != BIT_LO_8(opcode))
         {
             c8->PC += 2;
@@ -83,6 +99,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_4(opcode) == 0x0)
     {
         // SE Vx, Vy
+        LOG_OPCODE("SE Vx, Vy", opcode);
         if (*Vx == *Vy)
         {
             c8->PC += 2;
@@ -91,78 +108,90 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0x6)
     {
         // LD Vx, byte
+        LOG_OPCODE("LD Vx, byte", opcode);
         *Vx = BIT_LO_8(opcode);
     }
     else if (BIT_HI_4(opcode) == 0x7)
     {
         // ADD Vx, byte
         // note: no carry
+        LOG_OPCODE("ADD Vx, byte", opcode);
         *Vx += BIT_LO_8(opcode);
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x0)
     {
         // LD Vx, Vy
+        LOG_OPCODE("LD Vx, Vy", opcode);
         *Vx = *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x1)
     {
         // OR Vx, Vy
+        LOG_OPCODE("OR Vx, Vy", opcode);
         *Vx |= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x2)
     {
         // AND Vx, Vy
+        LOG_OPCODE("AND Vx, Vy", opcode);
         *Vx &= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x3)
     {
         // XOR Vx, Vy
+        LOG_OPCODE("XOR Vx, Vy", opcode);
         *Vx ^= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x4)
     {
         // ADD Vx, Vy
+        LOG_OPCODE("ADD Vx, Vy", opcode);
         uint16_t res = *Vx + *Vy;
         *Vx = res;
-        c8->Vx[0xF           ] = res > 0xFF;
+        c8->Vx[0xF] = res > 0xFF;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x5)
     {
         // SUB Vx, Vy
-        c8->Vx[0xF           ]  = *Vx > *Vy;
+        LOG_OPCODE("SUB Vx, Vy", opcode);
+        c8->Vx[0xF]  = *Vx > *Vy;
         *Vx -= *Vy;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x6)
     {
         // SHR Vx {, Vy}
-        c8->Vx[0xF           ]   = LSB_BYTE(*Vx);
+        LOG_OPCODE("SHR Vx {, Vy}", opcode);
+        c8->Vx[0xF]   = LSB_BYTE(*Vx);
         *Vx >>= 1;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0x7)
     {
         // SUBN Vx, Vy
-        c8->Vx[0xF           ] = *Vx < *Vy;
+        LOG_OPCODE("SUBN Vx, Vy", opcode);
+        c8->Vx[0xF] = *Vx < *Vy;
         *Vx = *Vy - *Vx;
     }
     else if (BIT_HI_4(opcode) == 0x8
           && BIT_LO_4(opcode) == 0xE)
     {
         // SHL Vx {, Vy}
-        c8->Vx[0xF           ]   = MSB_BYTE(*Vx);
+        LOG_OPCODE("SHL Vx {, Vy}", opcode);
+        c8->Vx[0xF]   = MSB_BYTE(*Vx);
         *Vx <<= 1;
     }
     else if (BIT_HI_4(opcode) == 0x9
           && BIT_LO_4(opcode) == 0xE)
     {
         // SNE Vx, Vy
+        LOG_OPCODE("SNE Vx, Vy", opcode);
         if (*Vx != *Vy)
         {
             c8->PC += 2;
@@ -171,21 +200,25 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     else if (BIT_HI_4(opcode) == 0xA)
     {
         // LD I, addr
+        LOG_OPCODE("LD I, addr", opcode);
         c8->I = BIT_LO_12(opcode);
     }
     else if (BIT_HI_4(opcode) == 0xB)
     {
         // JP V0, addr
+        LOG_OPCODE("JP V0, addr", opcode);
         c8->PC = c8->Vx[0] + BIT_LO_12(opcode);
     }
     else if (BIT_HI_4(opcode) == 0xC)
     {
         // RND Vx, byte
+        LOG_OPCODE("RND Vx, byte", opcode);
         *Vx = C8_Random_next(c8->Random) & BIT_LO_8(opcode);
     }
     else if (BIT_HI_4(opcode) == 0xD)
     {
         // DRW
+        LOG_OPCODE("DRW", opcode);
         bool collision = 0;
         int i;
         for (i=0; i<BIT_LO_4(opcode); ++i)
@@ -212,6 +245,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x9E)
     {
         // SKP Vx
+        LOG_OPCODE("SKP Vx", opcode);
         if (*Vx < NELEMS(c8->Key) && c8->Key[*Vx])
         {
             c8->PC += 2;
@@ -221,6 +255,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0xA1)
     {
         // SKNP Vx
+        LOG_OPCODE("SKNP Vx", opcode);
         if (*Vx < NELEMS(c8->Key) && !c8->Key[*Vx])
         {
             c8->PC += 2;
@@ -230,30 +265,35 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x07)
     {
         // LD Vx, DT
+        LOG_OPCODE("LD Vx, DT", opcode);
         *Vx = c8->DT;
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x0A)
     {
         // LD Vx, K
+        LOG_OPCODE("LD Vx, K", opcode);
         C8_set_key_lock(c8, X);
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x15)
     {
         // LD DT, Vx
+        LOG_OPCODE("LD DT, Vx", opcode);
         c8->DT = *Vx;
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x18)
     {
         // LD ST, Vx
+        LOG_OPCODE("LD ST, Vx", opcode);
         c8->ST = *Vx;
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x1E)
     {
         // ADD I, Vx -> No Overflow Flag!
+        LOG_OPCODE("ADD I, Vx", opcode);
         c8->I += *Vx;
         assert(c8->I <= C8_LAST_ADDR);
     }
@@ -261,12 +301,14 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x29)
     {
         // LD F, Vx
+        LOG_OPCODE("LD F, Vx", opcode);
         c8->I += C8_DIGIT_SIZE * BIT_LO_4(*Vx);
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x33)
     {
         // LD B, Vx
+        LOG_OPCODE("LD B, Vx", opcode);
         assert(c8->I + 2 <= C8_LAST_ADDR);
 
         int i;
@@ -281,6 +323,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x55)
     {
         // LD [I], Vx
+        LOG_OPCODE("LD [I], Vx", opcode);
         assert(c8->I + X <= C8_LAST_ADDR);
 
         int i;
@@ -292,6 +335,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
           && BIT_LO_8(opcode) == 0x65)
     {
         // LD Vx, [I]
+        LOG_OPCODE("LD Vx, [I]", opcode);
         assert(c8->I + X <= C8_LAST_ADDR);
 
         int i;

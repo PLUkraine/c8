@@ -43,6 +43,7 @@ add_library(c8_lib STATIC
   src/c8_random.c
   src/c8_display.c
   src/c8_read.c)
+# target_compile_definitions(c8_lib PRIVATE C8_LOG_OPCODE=1)
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 

@@ -62,7 +62,7 @@ TEST_F(c8_opcode, CLS)
     EXPECT_TRUE(C8_Display_is_clear(c8->Display));
 }
 
-TEST_F(c8_opcode, SYS)
+TEST_F(c8_opcode, DISABLED_SYS) // opcode not relevant
 {
     uint8_t opcode[] = { 0x0A, 0xBC, };
     C8_load_program(c8, opcode, NELEMS(opcode));
@@ -85,7 +85,7 @@ TEST_F(c8_opcode, RET_normal)
     uint8_t opcode[] = { 0x00, 0xEE,};
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    c8->Stack[1] = 0x0ABC;
+    c8->Stack[0] = 0x0ABC;
     c8->SP = 1;
 
     C8_cycle(c8);
@@ -98,7 +98,7 @@ TEST_F(c8_opcode, RET_overflow)
     uint8_t opcode[] = { 0x00, 0xEE, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    c8->Stack[0] = 0x0ABC;
+    c8->Stack[NELEMS(c8->Stack)-1] = 0x0ABC;
     c8->SP = 0;
 
     C8_cycle(c8);
@@ -125,13 +125,13 @@ TEST_F(c8_opcode, CALL_overflow)
     uint8_t opcode[] = { 0x2A, 0xBC, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    c8->Stack[15] = 0x0000;
-    c8->SP = 15;
+    c8->Stack[NELEMS(c8->Stack)-1] = 0x0000;
+    c8->SP = NELEMS(c8->Stack)-1;
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0xABC);
     EXPECT_EQ(c8->SP, 0);
-    EXPECT_EQ(c8->Stack[15], C8_START_ADDR + 0x02);
+    EXPECT_EQ(c8->Stack[NELEMS(c8->Stack)-1], C8_START_ADDR + 0x02);
 }
 
 TEST_F(c8_opcode, SE_skip)

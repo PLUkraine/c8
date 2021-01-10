@@ -1,21 +1,27 @@
 #include "logging.h"
 
-#include <SDL2/SDL_log.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
 
 void log_info(char *format, ...)
 {
     va_list args;
    
+    printf("INFO: ");
     va_start(args, format);
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, args);
+    vprintf(format, args);
     va_end(args);
+    printf("\n");
 }
 
 void log_error(char *format, ...)
 {
     va_list args;
    
+    printf("ERROR: ");
     va_start(args, format);
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, args);
+    vprintf(format, args);
     va_end(args);
+    printf("\n");
 }

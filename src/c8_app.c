@@ -23,11 +23,13 @@ struct C8_App
     C8_ptr c8;
 };
 
+
 void print_SDL_error_and_exit()
 {
     log_error("SDL error:\n%s", SDL_GetError());
     exit(EXIT_BAD);
 }
+
 
 void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
 {
@@ -57,6 +59,9 @@ void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
             SDL_RenderFillRect(renderer, &pixel);
         }
     }
+
+    // swap buffers -> show picture
+    SDL_RenderPresent(renderer);
 }
 
 
@@ -75,6 +80,28 @@ void load_c8_program(C8_ptr c8, const char *filepath)
 
     C8_reset(c8);
     C8_load_program(c8, opcodes, read_bytes);
+}
+
+
+float compute_delta(Uint64 *start_time)
+{
+    Uint64 end_time = SDL_GetPerformanceCounter();
+    float delta = (float) (end_time - *start_time) / SDL_GetPerformanceFrequency();
+    *start_time = end_time;
+    return delta;
+}
+
+
+void process_events(bool *quit)
+{
+    SDL_Event e;
+    while (SDL_PollEvent(&e) != 0)
+    {
+        if (e.type == SDL_QUIT)
+        {
+            *quit = true;
+        }
+    }
 }
 
 
@@ -111,6 +138,7 @@ C8_App_ptr C8_App_init(const char *game_path)
     return app;
 }
 
+
 void C8_App_free(C8_App_ptr *p_app)
 {
     assert(p_app && *p_app);
@@ -127,26 +155,20 @@ void C8_App_free(C8_App_ptr *p_app)
     *p_app = NULL;
 }
 
+
 void C8_App_main_loop(C8_App_ptr app)
 {
-    //Event handler
-    SDL_Event e;
     bool quit = false;
+    Uint64 start_time = SDL_GetPerformanceCounter();
+    
     while (!quit)
     {
-        while (SDL_PollEvent(&e) != 0)
-        {
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-        }
-
-        // C8_Display_pixel_toggle(app->disp, 1, 1);
-
+        float delta = compute_delta(&start_time);
+        log_info("Delta time: %f\n", delta);
+        
+        process_events(&quit);
         render_c8_disp(app->renderer, app->disp);
 
-        SDL_RenderPresent(app->renderer);
-        SDL_Delay(100);
+        SDL_Delay(1000);
     }
 }

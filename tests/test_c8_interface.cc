@@ -89,6 +89,34 @@ TEST_F(c8_tests, reset)
     }
 }
 
+TEST_F(c8_tests, timer)
+{
+    
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_timers(NULL), "Assertion `c8' failed");
+#endif
+
+    C8_reset(c8);
+    c8->DT = 1;
+    c8->ST = 3;
+
+    C8_timers(c8);
+    EXPECT_EQ(c8->DT, 0);
+    EXPECT_EQ(c8->ST, 2);
+    
+    C8_timers(c8);
+    EXPECT_EQ(c8->DT, 0);
+    EXPECT_EQ(c8->ST, 1);
+
+    C8_timers(c8);
+    EXPECT_EQ(c8->DT, 0);
+    EXPECT_EQ(c8->ST, 0);
+    
+    C8_timers(c8);
+    EXPECT_EQ(c8->DT, 0);
+    EXPECT_EQ(c8->ST, 0);
+}
+
 TEST_F(c8_tests, load_program)
 {
     C8_reset(c8);

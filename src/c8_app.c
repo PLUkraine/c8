@@ -57,7 +57,7 @@ void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
 }
 
 
-C8_App_ptr C8_App_init(void)
+C8_App_ptr C8_App_init(const char *windowTitle)
 {
     void   *malloc_call = NULL;
     C8_App_ptr app = NULL;
@@ -77,6 +77,7 @@ C8_App_ptr C8_App_init(void)
         APP_HEIGHT,
         SDL_WINDOW_SHOWN);
     if (!app->window) print_SDL_error_and_exit();
+    SDL_SetWindowTitle(app->window, windowTitle);
 
     app->renderer = SDL_CreateRenderer(app->window,
         -1,

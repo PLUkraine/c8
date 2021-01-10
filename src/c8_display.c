@@ -42,6 +42,7 @@ void C8_Display_free(C8_Display_ptr *disp)
 
 C8_Display_Color C8_Display_pixel(C8_Display_ptr disp, int row, int col)
 {
+    assert(disp);
     assert(0<=row && row<C8_DISPLAY_HEIGHT);
     assert(0<=col && col<C8_DISPLAY_WIDTH);
 
@@ -50,6 +51,7 @@ C8_Display_Color C8_Display_pixel(C8_Display_ptr disp, int row, int col)
 
 C8_Display_Color C8_Display_pixel_toggle(C8_Display_ptr disp, int row, int col)
 {
+    assert(disp);
     assert(0<=row && row<C8_DISPLAY_HEIGHT);
     assert(0<=col && col<C8_DISPLAY_WIDTH);
 

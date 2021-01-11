@@ -25,10 +25,11 @@ static const uint8_t C8_DIGITS[] = {
 };
 
 // 3.5795 MHz?
-C8_ptr C8_init(C8_Random_ptr rnd, C8_Display_ptr disp)
+C8_ptr C8_init(C8_Random_ptr rnd, C8_Display_ptr disp, C8_Keyboard_ptr keys)
 {
     assert(rnd);
     assert(disp);
+    assert(keys);
 
     void *malloc_call = NULL;
     C8_ptr c8 = NULL;
@@ -43,6 +44,7 @@ C8_ptr C8_init(C8_Random_ptr rnd, C8_Display_ptr disp)
 
     c8->Random = rnd;
     c8->Display = disp;
+    c8->Keyboard = keys;
 
     return c8;
 }
@@ -63,12 +65,11 @@ void C8_reset(C8_ptr c8)
     c8->PC = C8_START_ADDR;
     c8->SP = 0;
     c8->ST = 0;
-    c8->WriteKeyToRegistry = 0x00;
     memset(c8->Vx, 0x00, NELEMS(c8->Vx));
-    memset(c8->Key, 0x00, NELEMS(c8->Key));
     memcpy(c8->Ram, C8_DIGITS, NELEMS(C8_DIGITS));
 
     C8_Display_clear(c8->Display);
+    C8_Keyboard_clear(c8->Keyboard);
 }
 
 void C8_load_program (C8_ptr c8, const uint8_t *data, size_t n)
@@ -83,10 +84,9 @@ void C8_cycle (C8_ptr c8)
 {
     assert(c8);
     assert(!(c8->PC & 1));
-    assert(c8->WriteKeyToRegistry <= 0x10);
 
     // skip if waiting for key
-    if (C8_is_waiting_for_key(c8)) {
+    if (C8_Keyboard_is_locked(c8->Keyboard)) {
         return;
     }
     
@@ -100,17 +100,4 @@ void C8_timers(C8_ptr c8)
     assert(c8);
     if (c8->DT != 0) c8->DT--;
     if (c8->ST != 0) c8->ST--;
-}
-
-
-void C8_set_key(C8_ptr c8, uint8_t key, bool is_down)
-{
-    assert(c8);
-    assert(key < NELEMS(c8->Key));
-
-    if (C8_is_waiting_for_key(c8) && is_down) {
-        C8_remove_key_lock(c8, key);
-    }
-
-    c8->Key[key] = is_down;
 }

@@ -27,6 +27,7 @@ class c8_tests : public ::testing::Test {
 protected:
     C8_Random_ptr rnd;
     C8_Display_ptr disp;
+    C8_Keyboard_ptr keys;
     C8_ptr c8;
 
     c8_tests() {}
@@ -36,8 +37,9 @@ protected:
     {  
         rnd = C8_Random_new(TEST_SEED);
         disp = C8_Display_init();
+        keys = C8_Keyboard_init();
 
-        c8 = C8_init(rnd, disp);
+        c8 = C8_init(rnd, disp, keys);
         EXPECT_NE(c8, nullptr);
         EXPECT_NE(c8->Ram, nullptr);
     }
@@ -46,6 +48,7 @@ protected:
         C8_free(&c8);
         C8_Random_free(&rnd);
         C8_Display_free(&disp);
+        C8_Keyboard_free(&keys);
         EXPECT_EQ(c8, nullptr);
     }
 };
@@ -56,8 +59,9 @@ TEST_F(c8_tests, init_free)
 #ifndef NDEBUG
     C8_ptr empty = NULL;
 
-    EXPECT_DEBUG_DEATH(C8_init(NULL, disp), "Assertion `rnd' failed");
-    EXPECT_DEBUG_DEATH(C8_init(rnd, NULL), "Assertion `disp' failed");
+    EXPECT_DEBUG_DEATH(C8_init(NULL, disp, keys), "Assertion `rnd' failed");
+    EXPECT_DEBUG_DEATH(C8_init(rnd, NULL, keys), "Assertion `disp' failed");
+    EXPECT_DEBUG_DEATH(C8_init(rnd, disp, NULL), "Assertion `keys' failed");
     EXPECT_DEBUG_DEATH(C8_free(NULL), "Assertion `c8 && \\*c8' failed");
     EXPECT_DEBUG_DEATH(C8_free(&empty),  "Assertion `c8 && \\*c8' failed");
 #endif
@@ -80,11 +84,6 @@ TEST_F(c8_tests, reset)
     EXPECT_EQ(c8->Ram[16*5],          0x00);
     EXPECT_EQ(c8->Ram[0x500],         0xFA);
     EXPECT_EQ(c8->Ram[0x501],         0xA0);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-    for (size_t i=0; i<NELEMS(c8->Key); ++i)
-    {
-        EXPECT_EQ(c8->Key[i], 0x00);
-    }
 }
 
 TEST_F(c8_tests, timer)
@@ -133,67 +132,16 @@ TEST_F(c8_tests, load_program)
     }
 }
 
-TEST_F(c8_tests, set_key)
-{
-    C8_reset(c8);
-
-#ifndef NDEBUG
-    EXPECT_DEBUG_DEATH(C8_set_key(NULL, 0, false), "Assertion `c8' failed");
-    EXPECT_DEBUG_DEATH(C8_set_key(c8, 16, false), "Assertion `key < NELEMS\\(c8->Key\\)' failed");
-#endif
-
-    C8_set_key(c8, 3, true);
-    EXPECT_EQ(c8->Key[3], 1);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-    C8_set_key(c8, 0xF, true);
-    EXPECT_EQ(c8->Key[0xF], 1);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-    C8_set_key(c8, 3, false);
-    EXPECT_EQ(c8->Key[3], 0);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x00);
-}
-
-TEST_F(c8_tests, set_key_wait)
-{
-    C8_reset(c8);
-    
-    c8->Vx[0xA] = 0x00;
-    c8->WriteKeyToRegistry = 0xA + 1;
-    // no reaction
-    C8_set_key(c8, 3, false);
-    EXPECT_EQ(c8->Vx[0xA], 0);
-    EXPECT_EQ(c8->Key[3], false);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0xA + 1);
-
-    // set Vx[0xA] = 0x3
-    C8_set_key(c8, 0x3, true);
-    EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[3], true);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
-
-    // no change
-    C8_set_key(c8, 0x4, true);
-    EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[4], true);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
-    C8_set_key(c8, 0x3, false);
-    EXPECT_EQ(c8->Vx[0xA], 0x3);
-    EXPECT_EQ(c8->Key[3], false);
-    EXPECT_EQ(c8->WriteKeyToRegistry, 0x0);
-}
-
 TEST_F(c8_tests, cycle)
 {
     C8_reset(c8);
 
 #ifndef NDEBUG
     EXPECT_DEBUG_DEATH(C8_cycle(NULL), "Assertion `c8' failed");
-    c8->WriteKeyToRegistry = NELEMS(c8->Vx) + 1;
-    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
 #endif
 
     // won't execute until key was pressed
-    c8->WriteKeyToRegistry = NELEMS(c8->Vx);
+    C8_Keyboard_lock(c8->Keyboard, c8->Vx + 0);
     for (int i=0; i<100; ++i) {
         C8_cycle(c8);
         ASSERT_EQ(c8->PC, 0x200);
@@ -204,12 +152,13 @@ TEST_F(c8_tests, cycle)
     C8_load_program(c8, data, NELEMS(data));
 
     // releasing the key shoudn't remove the lock
-    C8_set_key(c8, NELEMS(c8->Vx)-1, false);
+    C8_Keyboard_set(c8->Keyboard, 0xA, C8_KEY_UP);
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x200);
 
     // key press unlocks execution
-    C8_set_key(c8, NELEMS(c8->Vx)-1, true);
+    C8_Keyboard_set(c8->Keyboard, 0xA, C8_KEY_DOWN);
+    EXPECT_EQ(c8->Vx[0], 0xA);
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, 0x202);
 }

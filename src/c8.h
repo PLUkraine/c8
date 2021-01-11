@@ -7,6 +7,7 @@
 
 #include "c8_random.h"
 #include "c8_display.h"
+#include "c8_keyboard.h"
 
 #define C8_START_ADDR ((uint16_t)0x0200)
 #define C8_LAST_ADDR  ((uint16_t)0x0FFF)
@@ -17,24 +18,22 @@ extern "C" {
 
 // expose for testing
 struct C8_T {
-    uint8_t        Vx[16];
-    uint16_t       I;
-    uint8_t        DT;
-    uint8_t        ST;
-    uint16_t       PC;
-    uint8_t        SP;
-    uint16_t       Stack[16];
-    uint8_t       *Ram;
-    C8_Random_ptr  Random;
-    C8_Display_ptr Display;
-    bool           Key[16];
-
-    uint8_t       WriteKeyToRegistry;
+    uint8_t         Vx[16];
+    uint16_t        I;
+    uint8_t         DT;
+    uint8_t         ST;
+    uint16_t        PC;
+    uint8_t         SP;
+    uint16_t        Stack[16];
+    uint8_t        *Ram;
+    C8_Random_ptr   Random;
+    C8_Display_ptr  Display;
+    C8_Keyboard_ptr Keyboard;
 };
 
 typedef struct C8_T *C8_ptr;
 
-extern C8_ptr   C8_init         (C8_Random_ptr rnd, C8_Display_ptr disp);
+extern C8_ptr   C8_init         (C8_Random_ptr rnd, C8_Display_ptr disp, C8_Keyboard_ptr keys);
 extern void     C8_free         (C8_ptr *c8);
 
 extern void     C8_reset        (C8_ptr c8);

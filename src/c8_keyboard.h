@@ -22,6 +22,8 @@ typedef struct C8_Keyboard* C8_Keyboard_ptr;
 extern C8_Keyboard_ptr C8_Keyboard_init(void);
 extern            void C8_Keyboard_free(C8_Keyboard_ptr *keys);
 
+
+extern            void C8_Keyboard_clear(C8_Keyboard_ptr keys);
 extern            void C8_Keyboard_set(C8_Keyboard_ptr keys, uint8_t key, C8_Key_State state);
 extern    C8_Key_State C8_Keyboard_get(C8_Keyboard_ptr keys, uint8_t key);
 extern            void C8_Keyboard_lock(C8_Keyboard_ptr keys, uint8_t *Vx);

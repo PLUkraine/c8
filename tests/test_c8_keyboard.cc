@@ -75,3 +75,18 @@ TEST_F(c8_keyboard, test_lock)
     EXPECT_EQ(Vx, 0x0A);
     EXPECT_FALSE(C8_Keyboard_is_locked(keys));
 }
+
+TEST_F(c8_keyboard, test_clear)
+{
+    C8_Keyboard_set(keys, 0xF, C8_KEY_DOWN);
+    C8_Keyboard_set(keys, 0xA, C8_KEY_UP);
+    C8_Keyboard_set(keys, 0x1, C8_KEY_DOWN);
+    C8_Keyboard_set(keys, 0x8, C8_KEY_DOWN);
+    C8_Keyboard_set(keys, 0x0, C8_KEY_DOWN);
+
+    C8_Keyboard_clear(keys);
+    for (int i=0; i<C8_KEYBOARD_SIZE; ++i)
+    {
+        EXPECT_EQ(C8_KEY_UP, C8_Keyboard_get(keys, i));
+    }
+}

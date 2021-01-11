@@ -37,6 +37,16 @@ void C8_Keyboard_free(C8_Keyboard_ptr *keys)
 }
 
 
+void C8_Keyboard_clear(C8_Keyboard_ptr keys)
+{
+    size_t i=0;
+    for (i=0; i<NELEMS(keys->key); ++i)
+    {
+        keys->key[i] = C8_KEY_UP;
+    }
+}
+
+
 void C8_Keyboard_set(C8_Keyboard_ptr keys, uint8_t key, C8_Key_State state)
 {
     assert(keys);

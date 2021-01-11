@@ -17,31 +17,6 @@ const uint16_t C8_DIGIT_SIZE    = 5;
 const uint16_t C8_SPRITE_WIDTH  = 8;
 
 
-uint8_t C8_is_waiting_for_key(C8_ptr c8)
-{
-    assert(c8->WriteKeyToRegistry <= NELEMS(c8->Vx));
-
-    return c8->WriteKeyToRegistry > 0;
-}
-
-void C8_set_key_lock(C8_ptr c8, uint8_t reg)
-{
-    assert(reg < NELEMS(c8->Vx));
-    assert(c8->WriteKeyToRegistry == 0x00);
-
-    c8->WriteKeyToRegistry = reg + 1;
-}
-
-void C8_remove_key_lock(C8_ptr c8, uint8_t key)
-{
-    assert(0 < c8->WriteKeyToRegistry && c8->WriteKeyToRegistry <= NELEMS(c8->Vx));
-    assert(key < NELEMS(c8->Key));
-
-    c8->Vx[c8->WriteKeyToRegistry - 1] = key;
-    c8->WriteKeyToRegistry = 0x00;
-}
-
-
 void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
 {
     // registers for commands _XY_
@@ -246,7 +221,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // SKP Vx
         LOG_OPCODE("SKP Vx", opcode, c8->PC);
-        if (*Vx < NELEMS(c8->Key) && c8->Key[*Vx])
+        if (C8_Keyboard_get(c8->Keyboard, *Vx) == C8_KEY_DOWN)
         {
             c8->PC += 2;
         }
@@ -256,7 +231,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // SKNP Vx
         LOG_OPCODE("SKNP Vx", opcode, c8->PC);
-        if (*Vx < NELEMS(c8->Key) && !c8->Key[*Vx])
+        if (C8_Keyboard_get(c8->Keyboard, *Vx) == C8_KEY_UP)
         {
             c8->PC += 2;
         }
@@ -273,7 +248,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // LD Vx, K
         LOG_OPCODE("LD Vx, K", opcode, c8->PC);
-        C8_set_key_lock(c8, X);
+        C8_Keyboard_lock(c8->Keyboard, Vx);
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x15)

@@ -12,7 +12,7 @@
 #define APP_HEIGHT (C8_DISPLAY_HEIGHT * 10)
 #define EXIT_BAD 1
 #define TIMER_FREQ (1.0f/60.0f)
-#define UPDATE_FREQ (1.0f/10.0f)
+#define UPDATE_FREQ (1.0f/200.0f)
 
 
 struct C8_App
@@ -22,6 +22,7 @@ struct C8_App
 
     C8_Random_ptr rng;
     C8_Display_ptr disp;
+    C8_Keyboard_ptr keys;
     C8_ptr c8;
 };
 
@@ -107,7 +108,7 @@ void process_events(bool *quit)
 }
 
 
-void process_keyboard(C8_ptr c8)
+void process_keyboard(C8_Keyboard_ptr keyboard)
 {
     const Uint8* keystates = SDL_GetKeyboardState(NULL);
     const int keys[] = {
@@ -135,7 +136,7 @@ void process_keyboard(C8_ptr c8)
     size_t i;
     for (i=0; i<NELEMS(keys); ++i)
     {
-        C8_set_key(c8, i, keystates[keys[i]]);
+        C8_Keyboard_set(keyboard, i, keystates[keys[i]]);
     }
 }
 
@@ -152,7 +153,8 @@ C8_App_ptr C8_App_init(const char *game_path)
     // init, reset and load program
     app->rng = C8_Random_new(42); // todo: init from time
     app->disp = C8_Display_init();
-    app->c8 = C8_init(app->rng, app->disp);
+    app->keys = C8_Keyboard_init();
+    app->c8 = C8_init(app->rng, app->disp, app->keys);
     load_c8_program(app->c8, game_path);
 
     // init SDL rendering
@@ -182,6 +184,7 @@ void C8_App_free(C8_App_ptr *p_app)
     C8_free(&(app->c8));
     C8_Random_free(&(app->rng));
     C8_Display_free(&(app->disp));
+    C8_Keyboard_free(&(app->keys));
 
     SDL_DestroyRenderer(app->renderer);
     SDL_DestroyWindow(app->window);
@@ -204,7 +207,7 @@ void C8_App_main_loop(C8_App_ptr app)
         // log_info("Delta time: %f\n", delta);
 
         process_events(&quit);
-        process_keyboard(app->c8);
+        process_keyboard(app->keys);
 
         timer_accum  += delta;
         while (timer_accum  > TIMER_FREQ) {

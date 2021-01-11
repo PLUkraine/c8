@@ -12,6 +12,7 @@ class c8_opcode : public ::testing::Test {
 protected:
     C8_Random_ptr  _rnd;
     C8_Display_ptr disp;
+    C8_Keyboard_ptr keys;
     C8_ptr           c8;
 
     c8_opcode() {}
@@ -37,7 +38,8 @@ protected:
     {
         disp = C8_Display_init();
         _rnd = C8_Random_new(TEST_SEED);
-        c8  = C8_init(_rnd, disp);
+        keys = C8_Keyboard_init();
+        c8  = C8_init(_rnd, disp, keys);
         C8_reset(c8);
     }
 
@@ -46,6 +48,7 @@ protected:
         C8_free(&c8);
         C8_Random_free(&_rnd);
         C8_Display_free(&disp);
+        C8_Keyboard_free(&keys);
     }
 };
 
@@ -58,15 +61,6 @@ TEST_F(c8_opcode, CLS)
     EXPECT_FALSE(C8_Display_is_clear(c8->Display));
     C8_cycle(c8);
     EXPECT_TRUE(C8_Display_is_clear(c8->Display));
-}
-
-TEST_F(c8_opcode, DISABLED_SYS) // opcode not relevant
-{
-    uint8_t opcode[] = { 0x0A, 0xBC, };
-    C8_load_program(c8, opcode, NELEMS(opcode));
-
-    C8_cycle(c8);
-    EXPECT_EQ(c8->PC, 0xABC);
 }
 
 TEST_F(c8_opcode, JP)
@@ -619,7 +613,7 @@ TEST_F(c8_opcode, SKP_Vx_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, true);
+    C8_Keyboard_set(c8->Keyboard, 0x3, C8_KEY_DOWN);
 
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
@@ -630,8 +624,7 @@ TEST_F(c8_opcode, SKP_Vx_no_skip)
     uint8_t opcode[] = { 0xEA, 0x9E, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
-    c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, false);
+    C8_Keyboard_set(c8->Keyboard, 0x3, C8_KEY_UP);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -643,10 +636,11 @@ TEST_F(c8_opcode, SKP_Vx_too_big)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 17;
-    C8_set_key(c8, 0xA, true);
+    C8_Keyboard_set(c8->Keyboard, 0xA, C8_KEY_DOWN);
     
-    C8_cycle(c8);
-    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
+#endif
 }
 
 TEST_F(c8_opcode, SKNP_Vx_skip)
@@ -655,7 +649,7 @@ TEST_F(c8_opcode, SKNP_Vx_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, false);
+    C8_Keyboard_set(c8->Keyboard, 0x3, C8_KEY_UP);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x04);
@@ -667,7 +661,7 @@ TEST_F(c8_opcode, SKNP_Vx_no_skip)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 3;
-    C8_set_key(c8, 0x3, true);
+    C8_Keyboard_set(c8->Keyboard, 0x3, C8_KEY_DOWN);
     
     C8_cycle(c8);
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
@@ -679,10 +673,11 @@ TEST_F(c8_opcode, SKNP_Vx_too_big)
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xA] = 17;
-    C8_set_key(c8, 0xA, true);
-    
-    C8_cycle(c8);
-    EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
+    C8_Keyboard_set(c8->Keyboard, 0xA, C8_KEY_DOWN);
+
+#ifndef NDEBUG
+    EXPECT_DEBUG_DEATH(C8_cycle(c8), "Assertion .* failed");
+#endif
 }
 
 TEST_F(c8_opcode, LD_Vx_DT)
@@ -705,7 +700,7 @@ TEST_F(c8_opcode, LD_Vx_K)
     
     // set key first, shouldn't unblock
     c8->Vx[0x8] = 0;
-    C8_set_key(c8, 0xA, true);
+    C8_Keyboard_set(c8->Keyboard, 0xA, C8_KEY_DOWN);
 
     // block execution until key is pressed
     C8_cycle(c8);
@@ -717,13 +712,13 @@ TEST_F(c8_opcode, LD_Vx_K)
     }
 
     // key was not pressed, should block
-    C8_set_key(c8, 0xB, false);
+    C8_Keyboard_set(c8->Keyboard, 0x3, C8_KEY_UP);
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, C8_START_ADDR + 0x02);
     ASSERT_EQ(c8->Vx[0x8], 0);
 
     // key was pressed
-    C8_set_key(c8, 0xB, true);
+    C8_Keyboard_set(c8->Keyboard, 0xB, C8_KEY_DOWN);
     C8_cycle(c8);
     ASSERT_EQ(c8->PC, C8_START_ADDR + 0x04);
     ASSERT_EQ(c8->Vx[0x8], 0xB);

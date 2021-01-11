@@ -163,7 +163,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         *Vx <<= 1;
     }
     else if (BIT_HI_4(opcode) == 0x9
-          && BIT_LO_4(opcode) == 0xE)
+          && BIT_LO_4(opcode) == 0x0)
     {
         // SNE Vx, Vy
         LOG_OPCODE("SNE Vx, Vy", opcode, c8->PC);

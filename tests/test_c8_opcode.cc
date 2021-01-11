@@ -418,7 +418,7 @@ TEST_F(c8_opcode, SHL_right_1)
 
 TEST_F(c8_opcode, SNE_V_skip)
 {
-    uint8_t opcode[] = { 0x9C, 0x4E, 0x00, 0x00, 0x94, 0xCE,};
+    uint8_t opcode[] = { 0x9C, 0x40, 0x00, 0x00, 0x94, 0xC0,};
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xC] = 0x81;
@@ -433,7 +433,7 @@ TEST_F(c8_opcode, SNE_V_skip)
 
 TEST_F(c8_opcode, SNE_V_no_skip)
 {
-    uint8_t opcode[] = { 0x9C, 0x4E, 0x94, 0xCE,};
+    uint8_t opcode[] = { 0x9C, 0x40, 0x94, 0xC0,};
     C8_load_program(c8, opcode, NELEMS(opcode));
 
     c8->Vx[0xC] = 0x81;

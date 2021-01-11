@@ -786,6 +786,7 @@ TEST_F(c8_opcode, LD_F_Vx_multidigit)
     uint8_t opcode[] = { 0xFC, 0x29, };
     C8_load_program(c8, opcode, NELEMS(opcode));
 
+    c8->I = 0xA45;
     c8->Vx[0xC] = 0xFA;
 
     C8_cycle(c8);

@@ -302,7 +302,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
     {
         // LD F, Vx
         LOG_OPCODE("LD F, Vx", opcode, c8->PC);
-        c8->I += C8_DIGIT_SIZE * (*Vx);
+        c8->I = C8_DIGIT_SIZE * (*Vx);
     }
     else if (BIT_HI_4(opcode) == 0xF
           && BIT_LO_8(opcode) == 0x33)

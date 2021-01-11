@@ -789,7 +789,7 @@ TEST_F(c8_opcode, LD_F_Vx_multidigit)
     c8->Vx[0xC] = 0xFA;
 
     C8_cycle(c8);
-    EXPECT_EQ(c8->I, (C8_DIGIT_SIZE * 0xA));
+    EXPECT_EQ(c8->I, (C8_DIGIT_SIZE * 0xFA));
     EXPECT_EQ(c8->PC, C8_START_ADDR + 0x02);
 }
 

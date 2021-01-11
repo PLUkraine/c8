@@ -12,7 +12,7 @@
 #define APP_HEIGHT (C8_DISPLAY_HEIGHT * 10)
 #define EXIT_BAD 1
 #define TIMER_FREQ (1.0f/60.0f)
-#define UPDATE_FREQ (1.0f/200.0f)
+#define UPDATE_FREQ (1.0f/10.0f)
 
 
 struct C8_App

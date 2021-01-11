@@ -11,6 +11,10 @@
 #define C8_START_ADDR ((uint16_t)0x0200)
 #define C8_LAST_ADDR  ((uint16_t)0x0FFF)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // expose for testing
 struct C8_T {
     uint8_t        Vx[16];
@@ -38,5 +42,9 @@ extern void     C8_load_program (C8_ptr c8, const uint8_t *data, size_t n);
 extern void     C8_cycle        (C8_ptr c8);
 extern void     C8_timers       (C8_ptr c8);
 extern void     C8_set_key      (C8_ptr c8, uint8_t key, bool is_down);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // C8_H_INCLUDED

@@ -1,9 +1,7 @@
 #include "gtest/gtest.h"
-extern "C"
-{
-    #include "cummon.h"
-    #include "c8.h"
-}
+
+#include "cummon.h"
+#include "c8.h"
 
 TEST(cummon_test, bit_defines)
 {

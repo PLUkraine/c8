@@ -1,9 +1,7 @@
 #include "gtest/gtest.h"
-extern "C"
-{
-    #include "cummon.h"
-    #include "c8_random.h"
-}
+
+#include "cummon.h"
+#include "c8_random.h"
 
 TEST(c8_random, two_instances_sync)
 {

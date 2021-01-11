@@ -3,11 +3,8 @@
 #include <fstream>
 #include <string>
 
-extern "C"
-{
-    #include "cummon.h"
-    #include "c8_read.h"
-}
+#include "cummon.h"
+#include "c8_read.h"
 
 class c8_read : public ::testing::Test {
 protected:

@@ -1,9 +1,7 @@
 #include "gtest/gtest.h"
-extern "C"
-{
-    #include "cummon.h"
-    #include "c8_display.h"
-}
+
+#include "cummon.h"
+#include "c8_display.h"
 
 class c8_display : public ::testing::Test {
 protected:

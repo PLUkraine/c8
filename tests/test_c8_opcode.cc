@@ -1,10 +1,8 @@
 #include "gtest/gtest.h"
-extern "C"
-{
-    #include "cummon.h"
-    #include "c8.h"
-    #include "c8_private.h"
-}
+
+#include "cummon.h"
+#include "c8.h"
+#include "c8_private.h"
 
 // determinted by a objectively random dice roll on my table
 const uint32_t TEST_SEED = 4;

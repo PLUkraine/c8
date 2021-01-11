@@ -7,6 +7,10 @@
 #define C8_DISPLAY_WIDTH 64
 #define C8_DISPLAY_HEIGHT 32
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct C8_Display;
 typedef struct C8_Display *C8_Display_ptr;
 
@@ -24,5 +28,9 @@ extern void                C8_Display_clear(C8_Display_ptr disp);
 extern bool                C8_Display_is_clear(C8_Display_ptr disp);
 
 extern int coord_1d(int row, int col, int width);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

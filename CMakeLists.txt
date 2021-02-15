@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(c8 VERSION 0.1.0)
 
+# options
+option(PRINT_OPCODES "print dissassembly info" OFF)
+option(PROFILER_BUILD "compile for profiling" OFF)
+
 # Set C compiler flags
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
@@ -13,7 +17,6 @@ else()
 endif()
 
 # profiler?
-option(PROFILER_BUILD "compile for profiling" OFF)
 set(PROFILER_FLAGS "")
 if(${PROFILER_BUILD})
   message("Compiling for profiling")
@@ -44,7 +47,10 @@ add_library(c8_lib STATIC
   src/c8_display.c
   src/c8_read.c
   src/c8_keyboard.c)
-target_compile_definitions(c8_lib PRIVATE C8_LOG_OPCODE=1)
+if (${PRINT_OPCODES})
+  message("Defining LOG_OPCODE...")
+  target_compile_definitions(c8_lib PRIVATE C8_LOG_OPCODE=1)
+endif()
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 

@@ -83,7 +83,6 @@ void C8_load_program (C8_ptr c8, const uint8_t *data, size_t n)
 void C8_cycle (C8_ptr c8)
 {
     assert(c8);
-    assert(!(c8->PC & 1));
 
     // skip if waiting for key
     if (C8_Keyboard_is_locked(c8->Keyboard)) {

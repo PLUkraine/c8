@@ -12,7 +12,6 @@
 #define APP_HEIGHT (C8_DISPLAY_HEIGHT * 10)
 #define EXIT_BAD 1
 #define TIMER_FREQ (1.0f/60.0f)
-#define UPDATE_FREQ (1.0f/200.0f)
 
 
 struct C8_App
@@ -24,6 +23,7 @@ struct C8_App
     C8_Display_ptr disp;
     C8_Keyboard_ptr keys;
     C8_ptr c8;
+    float update_freq;
 };
 
 
@@ -141,7 +141,7 @@ void process_keyboard(C8_Keyboard_ptr keyboard)
 }
 
 
-C8_App_ptr C8_App_init(const char *game_path)
+C8_App_ptr C8_App_init(const char *game_path, size_t fps)
 {
     void   *malloc_call = NULL;
     C8_App_ptr app = NULL;
@@ -151,6 +151,7 @@ C8_App_ptr C8_App_init(const char *game_path)
     app = (C8_App_ptr) malloc_call;
 
     // init, reset and load program
+    app->update_freq = 1.0f / fps;
     app->rng = C8_Random_new(42); // todo: init from time
     app->disp = C8_Display_init();
     app->keys = C8_Keyboard_init();
@@ -204,7 +205,6 @@ void C8_App_main_loop(C8_App_ptr app)
     while (!quit)
     {
         float delta = compute_delta(&start_time);
-        // log_info("Delta time: %f\n", delta);
 
         process_events(&quit);
         process_keyboard(app->keys);
@@ -216,8 +216,8 @@ void C8_App_main_loop(C8_App_ptr app)
         }
 
         update_accum += delta;
-        while (update_accum > UPDATE_FREQ) {
-            update_accum -= UPDATE_FREQ;
+        while (update_accum > app->update_freq) {
+            update_accum -= app->update_freq;
             C8_cycle(app->c8);
         }
         

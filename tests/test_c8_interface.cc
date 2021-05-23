@@ -74,9 +74,9 @@ TEST_F(c8_tests, reset)
     EXPECT_DEBUG_DEATH(C8_reset(NULL), "Assertion `c8' failed");
 #endif
 
+    C8_reset(c8);
     c8->Ram[0x500] = 0xFA;
     c8->Ram[0x501] = 0xA0;
-    C8_reset(c8);
     EXPECT_EQ(C8_Display_is_clear(c8->Display), true);
     EXPECT_EQ(c8->PC,                 0x200);
     EXPECT_EQ(c8->Ram[0],             0xF0);
@@ -126,7 +126,7 @@ TEST_F(c8_tests, load_program)
 #endif
 
     C8_load_program(c8, (uint8_t *)data, strlen(data));
-    for (size_t i=0; i<NELEMS(data); ++i)
+    for (size_t i=0; i<strlen(data); ++i)
     {
         EXPECT_EQ(c8->Ram[0x200+i], data[i]);
     }

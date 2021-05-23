@@ -65,6 +65,7 @@ void C8_reset(C8_ptr c8)
     c8->PC = C8_START_ADDR;
     c8->SP = 0;
     c8->ST = 0;
+    memset(c8->Ram, 0x00, C8_LAST_ADDR + 1);
     memset(c8->Vx, 0x00, NELEMS(c8->Vx));
     memcpy(c8->Ram, C8_DIGITS, NELEMS(C8_DIGITS));
 

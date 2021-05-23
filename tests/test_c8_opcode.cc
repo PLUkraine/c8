@@ -852,7 +852,7 @@ TEST_F(c8_opcode, LD_Ram_Vx_normal)
 
     uint8_t start_val = 0x60;
     c8->I = 0x0515;
-    for (size_t i=0; i<NELEMS(c8->Vx); ++i)
+    for (uint8_t i=0; i<NELEMS(c8->Vx); ++i)
     {
         c8->Vx[i] = start_val + i;
     }
@@ -879,7 +879,7 @@ TEST_F(c8_opcode, LD_Vx_Ram_normal)
 
     uint8_t start_val = 0x60;
     c8->I = 0x0515;
-    for (size_t i=0; i<NELEMS(c8->Vx); ++i)
+    for (uint8_t i=0; i<NELEMS(c8->Vx); ++i)
     {
         c8->Ram[c8->I + i] = start_val + i;
     }

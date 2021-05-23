@@ -1,0 +1,6 @@
+[requires]
+sdl2/2.0.14@bincrafters/stable
+gtest/1.10.0
+
+[generators]
+cmake

@@ -2,6 +2,11 @@
 
 #include <stdio.h>
 
+// disable warning about fread not being safe
+#if (_MSC_VER >= 1500)
+#pragma warning(disable:4996)
+#endif
+
 size_t C8_read_program(const char *path, uint8_t *buffer, size_t max_size)
 {
     FILE *c8_file = NULL;

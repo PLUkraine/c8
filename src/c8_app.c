@@ -70,19 +70,19 @@ void render_c8_disp(SDL_Renderer *renderer, C8_Display_ptr disp)
 
 void load_c8_program(C8_ptr c8, const char *filepath)
 {
-    const size_t N = C8_LAST_ADDR - C8_START_ADDR + 1;
+ #define N (C8_LAST_ADDR - C8_START_ADDR + 1)
     uint8_t opcodes[N];
     size_t read_bytes = 0;
     if ((read_bytes = C8_read_program(filepath, opcodes, N)) == 0) {
         log_error("Couldn't read game data. Make sure that file \"%s\" exists and it is less than %d bytes",
             filepath,
             N);
-        log_error("ERRNO: %s", strerror(errno));
         exit(EXIT_BAD);
     }
 
     C8_reset(c8);
     C8_load_program(c8, opcodes, read_bytes);
+#undef N
 }
 
 
@@ -133,7 +133,7 @@ void process_keyboard(C8_Keyboard_ptr keyboard)
         SDL_SCANCODE_V, // 0x0F
     };
 
-    size_t i;
+    uint8_t i;
     for (i=0; i<NELEMS(keys); ++i)
     {
         C8_Keyboard_set(keyboard, i, keystates[keys[i]]);

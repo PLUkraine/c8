@@ -127,7 +127,7 @@ void C8_exec_opcode(C8_ptr c8, uint16_t opcode)
         // ADD Vx, Vy
         LOG_OPCODE("ADD Vx, Vy", opcode, c8->PC);
         uint16_t res = *Vx + *Vy;
-        *Vx = res;
+        *Vx = (uint8_t) res;
         c8->Vx[0xF] = res > 0xFF;
     }
     else if (BIT_HI_4(opcode) == 0x8

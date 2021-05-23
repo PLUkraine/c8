@@ -33,7 +33,7 @@ TEST_F(c8_keyboard, test_init_free)
     EXPECT_DEBUG_DEATH(C8_Keyboard_free(&empty),  "Assertion `keys && \\*keys' failed");
 #endif
 
-    for (int i=0; i<C8_KEYBOARD_SIZE; ++i)
+    for (uint8_t i=0; i<C8_KEYBOARD_SIZE; ++i)
     {
         EXPECT_EQ(C8_KEY_UP, C8_Keyboard_get(keys, i));
     }
@@ -85,7 +85,7 @@ TEST_F(c8_keyboard, test_clear)
     C8_Keyboard_set(keys, 0x0, C8_KEY_DOWN);
 
     C8_Keyboard_clear(keys);
-    for (int i=0; i<C8_KEYBOARD_SIZE; ++i)
+    for (uint8_t i=0; i<C8_KEYBOARD_SIZE; ++i)
     {
         EXPECT_EQ(C8_KEY_UP, C8_Keyboard_get(keys, i));
     }

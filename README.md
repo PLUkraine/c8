@@ -4,4 +4,5 @@
 1. `cd /path/to/c8`
 1. `mkdir build && cd build`
 1. `conan install .. --build=missing`
-1. `cd .. && cmake -S . -B build` 
+1. `cd .. && cmake -S . -B build --config Release`
+1. build for Release - otherwise fails!

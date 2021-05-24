@@ -8,7 +8,9 @@ CHIP-8 is an old VM from the 1970-s. This is an implementation of CHIP-8 VM for 
 ## Build
 
 You have to install [CMake](https://cmake.org/) to build this project.  
-If you are using Conan, you also need [python](https://www.python.org/) and [pip](https://pip.pypa.io/en/stable/installing/).
+If you are using Conan, you also need [python](https://www.python.org/) and [pip](https://pip.pypa.io/en/stable/installing/).  
+On Windows you need to install Visual Studio.  
+On MacOS you need to install XCode.  
 
 ### Conan (recommended)
 
@@ -28,7 +30,8 @@ conan config set general.revisions_enabled=1
 ```
 
  
-Windows users: don't forget to add [pip script folder](https://www.onlinetutorialspoint.com/python/where-can-i-find-python-pip-in-windows.html) to your PATH environment variable (if you haven't already).
+Windows users: don't forget to add [pip script folder](https://www.onlinetutorialspoint.com/python/where-can-i-find-python-pip-in-windows.html)
+to your PATH environment variable (if you haven't already).
 
 #### Clone and Build:
 
@@ -76,7 +79,7 @@ cmake --build build --config Release
 
 Download some [ROMs](https://github.com/dmatlack/chip8/tree/master/roms).  
 Locate `c8` executable in `c8/build` folder.  
-Execute `c8 200 /path/to/the/rom`
+Execute `c8 200 /path/to/the/rom`.
 
 Use `1234 qwer asdf zxcv` keys and experiment with the game.  
 And, most importantly, have fun!

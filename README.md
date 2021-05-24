@@ -4,6 +4,8 @@
 
 CHIP-8 is an old VM from the 1970-s. This is an implementation of CHIP-8 VM for modern systems. It is not 100% accurate and made for my pleasure. You can use it for reference (or your course work).
 
+You can read more in my [blog post](https://cgmathprog.home.blog/2021/05/20/chip-8-and-emulator-overview/).
+
 
 ## Build
 

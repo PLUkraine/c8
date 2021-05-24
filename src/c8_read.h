@@ -2,6 +2,7 @@
 #define C8_READ_H_INCLUDED
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

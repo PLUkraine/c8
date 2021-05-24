@@ -1,12 +1,22 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(c8 VERSION 0.1.0)
+project(c8 VERSION 1.0.0)
+
 
 # options
+option(USE_CONAN "configure with conan" OFF)
 option(PRINT_OPCODES "print dissassembly info" OFF)
 option(PROFILER_BUILD "compile for profiling" OFF)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+
+# dependencies
+if (${USE_CONAN})
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup(TARGETS)
+else()
+  find_package(SDL2 REQUIRED)
+  find_package(GTest REQUIRED)
+endif()
+
 
 # Set C compiler flags
 set(CMAKE_C_STANDARD 11)
@@ -19,6 +29,7 @@ else()
   set(COMPILER_WARNINGS -Wall -Wextra -Werror)
 endif()
 
+
 # profiler?
 set(PROFILER_FLAGS "")
 if(${PROFILER_BUILD})
@@ -30,11 +41,13 @@ if(${PROFILER_BUILD})
   endif()
 endif()
 
-# Testing?
+
+# testing
 include(CTest)
 include(GoogleTest)
 enable_testing()
 add_subdirectory(tests)
+
 
 # create targets
 add_library(c8_lib STATIC
@@ -52,13 +65,14 @@ endif()
 target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 
+
 add_executable(c8
   src/main.c
   src/c8_app.c)
-target_link_libraries(c8 PRIVATE CONAN_PKG::sdl2 c8_lib)
 target_compile_options(c8 PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 
-# CPack?
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+if (${USE_CONAN})
+  target_link_libraries(c8 PRIVATE CONAN_PKG::sdl2 c8_lib)
+else()
+  target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)
+endif()

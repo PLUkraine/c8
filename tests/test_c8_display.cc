@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "cummon.h"
+#include "common.h"
 #include "c8_display.h"
 
 class c8_display : public ::testing::Test {

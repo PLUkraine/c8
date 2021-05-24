@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "cummon.h"
+#include "common.h"
 
 
 struct C8_Keyboard

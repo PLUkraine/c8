@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cummon.h"
+#include "common.h"
 #include "c8.h"
 #include "c8_private.h"
 

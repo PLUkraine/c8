@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-#include "cummon.h"
+#include "common.h"
 #include "logging.h"
 #include "c8_app.h"
 

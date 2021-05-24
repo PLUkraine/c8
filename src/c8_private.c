@@ -1,7 +1,7 @@
 #include "c8_private.h"
 
 #include <assert.h>
-#include "cummon.h"
+#include "common.h"
 
 
 #ifdef C8_LOG_OPCODE

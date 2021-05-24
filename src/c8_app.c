@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <assert.h>
 #include <errno.h>
-#include "cummon.h"
+#include "common.h"
 #include "logging.h"
 #include "c8.h"
 #include "c8_read.h"

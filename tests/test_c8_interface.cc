@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 
-#include "cummon.h"
+#include "common.h"
 #include "c8.h"
 
-TEST(cummon_test, bit_defines)
+TEST(common_test, bit_defines)
 {
     auto number   = 0xBB2f56;
     auto number_2 = 0xFF0081;

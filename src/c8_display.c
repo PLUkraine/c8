@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "cummon.h"
+#include "common.h"
 
 static const int C8_DISPLAY_SIZE = C8_DISPLAY_WIDTH * C8_DISPLAY_HEIGHT;
 

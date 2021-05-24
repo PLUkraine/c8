@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include "cummon.h"
+#include "common.h"
 #include "c8_read.h"
 
 class c8_read : public ::testing::Test {

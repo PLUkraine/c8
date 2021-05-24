@@ -1,4 +1,4 @@
-#ifndef CUMMON_H_INCLUDED
+#ifndef COMMON_H_INCLUDED
 
 #define Q_UNUSED(x) ((void)(x))
 #define NELEMS(x) ((sizeof (x))/(sizeof ((x)[0])))
@@ -13,4 +13,4 @@
 #define MSB_BYTE(x)  (((x) &   0x80) >> 7)
 #define LSB_BYTE(x)  ((x) &  0x0001)
 
-#endif // CUMMON_H_INCLUDED
+#endif // COMMON_H_INCLUDED

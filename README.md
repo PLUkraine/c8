@@ -35,22 +35,13 @@ to your PATH environment variable (if you haven't already).
 
 #### Clone and Build:
 
-Unix
-
 ```bash
 git clone https://github.com/plukraine/c8
 cd c8
 
-# you can either copy-paste this code
-# or use ./conan_build.sh script
-mkdir build -p
-
-pushd build
-conan install .. --build=missing -s compiler.libcxx=libstdc++11
-popd
-
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DUSE_CONAN=ON
-cmake --build build --config Release
+# create build directory and build the project
+./conan_build.sh # unix
+conan_build.bat # windows
 ```
 
 ### The Old-Fashioned Way

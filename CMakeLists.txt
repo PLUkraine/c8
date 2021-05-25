@@ -30,15 +30,11 @@ else()
 endif()
 
 
-# profiler?
+# profiler (gcc or clang)
 set(PROFILER_FLAGS "")
-if(${PROFILER_BUILD})
+if(NOT MSVC AND ${PROFILER_BUILD})
   message("Compiling for profiling")
-  if(MSVC)
-    set(PROFILER_FLAGS /PROFILE)
-  else()
-    set(PROFILER_FLAGS -pg)
-  endif()
+  set(PROFILER_FLAGS -pg)
 endif()
 
 
@@ -49,7 +45,7 @@ enable_testing()
 add_subdirectory(tests)
 
 
-# create targets
+# create library target
 add_library(c8_lib STATIC
   src/logging.c
   src/c8.c
@@ -66,6 +62,7 @@ target_compile_options(c8_lib PRIVATE ${COMPILER_WARNINGS} ${PROFILER_FLAGS})
 target_include_directories(c8_lib PUBLIC src)
 
 
+# create app target
 add_executable(c8
   src/main.c
   src/c8_app.c)
@@ -75,4 +72,12 @@ if (${USE_CONAN})
   target_link_libraries(c8 PRIVATE CONAN_PKG::sdl2 c8_lib)
 else()
   target_link_libraries(c8 PRIVATE SDL2::SDL2 c8_lib)
+endif()
+
+
+# profiler (visual studio)
+if(MSVC AND ${PROFILER_BUILD})
+  message("Compiling for profiling")
+  SET_TARGET_PROPERTIES(c8_lib PROPERTIES LINK_FLAGS "/PROFILE")
+  SET_TARGET_PROPERTIES(c8 PROPERTIES LINK_FLAGS "/PROFILE")
 endif()

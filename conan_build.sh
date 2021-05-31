@@ -10,7 +10,7 @@ case "$(uname -s)" in
         conan install .. --build=missing -s compiler.libcxx=libstdc++11
         ;;
     *)
-        conan install .. --build=missing -s compiler.libcxx=libstdc++
+        conan install .. --build=missing
         ;;
 esac
 popd
